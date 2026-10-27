@@ -1,7 +1,20 @@
-const { app, BaseWindow, BrowserWindow, WebContentsView, View, Menu, ipcMain, dialog, shell, nativeImage, session, clipboard } = require('electron');
+const { app, BaseWindow, BrowserWindow, WebContentsView, View, Menu, Tray, ipcMain, dialog, shell, nativeImage, session, clipboard } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const vm = require('vm');
+
+// Garante uma única instância do aplicativo rodando.
+// Se o usuário tentar abrir de novo (ex.: pelo atalho enquanto está nos ícones ocultos),
+// traz a janela existente para a frente em vez de abrir um segundo processo.
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+  process.exit(0);
+} else {
+  app.on('second-instance', () => {
+    showMainWindow();
+  });
+}
 
 // Suporte a dados portáteis: se existir a pasta "mefislink-data" ao lado do executável, usa ela.
 // Caso contrário, salva no AppData do Windows do usuário (%APPDATA%\Mefislink).
@@ -60,7 +73,7 @@ const ACCOUNTS = ['Conta 1', 'Conta 2', 'Conta 3', 'Conta 4'];
 
 // ====== VERSÃO ======
 const APP_NAME = 'Mefislink';
-const APP_VERSION = '1.0';
+const APP_VERSION = '1.1';
 const APP_CHANNEL = '';
 // Contato para pedidos de remoção (aparece em "Direitos e marcas"). Ex.: 'contato@seudominio.com'
 // Enquanto estiver vazio, esse trecho não é exibido.
@@ -107,6 +120,63 @@ let titleBar = null;
 let menuOpen = false; // com um menu aberto, a barra de título cobre a janela toda (transparente)
 let appMenu = null;
 let win;
+let tray = null;
+let isQuitting = false;
+let hasNotifiedTray = false;
+
+function showMainWindow() {
+  if (!win) return;
+  if (win.isMinimized()) win.restore();
+  if (!win.isVisible()) win.show();
+  win.focus();
+}
+
+function createTray() {
+  if (tray) return;
+
+  const icoFile = path.join(__dirname, 'icone.ico');
+  const pngFile = path.join(__dirname, 'icone.png');
+  let icon = null;
+
+  if (fs.existsSync(icoFile)) {
+    icon = nativeImage.createFromPath(icoFile);
+  } else if (fs.existsSync(pngFile)) {
+    icon = nativeImage.createFromPath(pngFile);
+  } else {
+    const custom = customIconPath();
+    if (custom) icon = nativeImage.createFromPath(custom);
+  }
+
+  tray = new Tray(icon || icoFile);
+  tray.setToolTip('Mefislink');
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Abrir Mefislink',
+      click: () => {
+        showMainWindow();
+      },
+    },
+    { type: 'separator' },
+    {
+      label: 'Encerrar o Mefislink',
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.setContextMenu(contextMenu);
+
+  tray.on('click', () => {
+    showMainWindow();
+  });
+
+  tray.on('double-click', () => {
+    showMainWindow();
+  });
+}
 let bars = [];
 let views = [];
 let focused = -1; // -1 = grade 2x2, 0..3 = tela cheia de uma conta
@@ -803,17 +873,6 @@ function buildMenu() {
       submenu: each((i) => ({ label: `Análise de PvP — ${nameOf(i)}`, click: () => openPvp(i) })),
     },
     {
-      label: 'Atualizações',
-      submenu: [
-        { label: 'Procurar atualização', click: () => checkOnlineUpdate(true) },
-        { label: 'Instalar atualização de arquivo...', click: applyUpdate },
-        // o atalho funciona mesmo se a barra de cima quebrar depois de uma atualização ruim
-        { label: 'Desfazer última atualização', accelerator: 'CmdOrCtrl+Shift+Z', click: undoUpdate },
-        { type: 'separator' },
-        { label: `Versão instalada: ${APP_CHANNEL ? APP_CHANNEL + ' ' : ''}${APP_VERSION}`, enabled: false },
-      ],
-    },
-    {
       label: 'Ajuda',
       submenu: [
         { label: 'Extensões (/hunt, Rotom Sniper)', click: showExtensions },
@@ -824,6 +883,7 @@ function buildMenu() {
         { label: 'Gerar relatório de erro', submenu: each((i) => ({ label: nameOf(i), click: () => saveOutline(i) })) },
         { type: 'separator' },
         { label: 'Reiniciar o Mefislink', accelerator: 'CmdOrCtrl+Shift+R', click: restartApp },
+        { label: 'Encerrar o Mefislink', accelerator: 'CmdOrCtrl+Q', click: () => { isQuitting = true; app.quit(); } },
       ],
     },
   ];
@@ -3081,6 +3141,37 @@ function createWindow() {
   win.on('resize', layout);
   win.on('enter-full-screen', layout);
   win.on('leave-full-screen', layout);
+
+  // Fecha para a bandeja (ícones ocultos): ao clicar no X, a janela é apenas ocultada
+  // e o aplicativo continua rodando em segundo plano.
+  win.on('close', (e) => {
+    if (!isQuitting) {
+      e.preventDefault();
+      win.hide();
+      if (!hasNotifiedTray && tray) {
+        hasNotifiedTray = true;
+        try {
+          tray.displayBalloon({
+            title: 'Mefislink',
+            content: 'O Mefislink continua rodando em segundo plano nos ícones ocultos. Clique no ícone para reabrir.',
+          });
+        } catch {}
+      }
+    }
+  });
+
+  win.on('closed', () => {
+    win = null;
+    if (tray) {
+      try { tray.destroy(); } catch {}
+      tray = null;
+    }
+    if (!isQuitting) {
+      isQuitting = true;
+      app.quit();
+    }
+  });
+
   layout();
 
   buildMenu();
@@ -3092,13 +3183,17 @@ function createWindow() {
   muted.forEach((m, i) => views[i].webContents.setAudioMuted(m));
 }
 
+app.on('before-quit', () => {
+  isQuitting = true;
+});
+
 app.whenReady().then(async () => {
   applyGoogleLoginFix(session.defaultSession);
   // extensões: carrega as cópias locais antes das contas abrirem e procura atualização em segundo plano
   const extFaltando = await loadLocalExtensions();
   createWindow();
+  createTray();
   updateExtensions(extFaltando);
-  win.on('closed', () => app.quit()); // fecha tudo junto (inclusive janelas de login abertas)
   setTimeout(checkLives, 3000); // já verifica logo ao abrir
   setInterval(checkLives, LIVE_CHECK_MIN * 60 * 1000);
   sampleUsage(); setInterval(sampleUsage, 5000); // mede CPU/memória de cada conta
@@ -3113,4 +3208,8 @@ app.whenReady().then(async () => {
   setInterval(pollKickPoints, KICK_POLL_SEC * 1000); // pontos da Kick em tempo real
   setInterval(pvpCollectAll, PVP_EVERY_MIN * 60 * 1000);
 });
-app.on('window-all-closed', () => app.quit());
+app.on('window-all-closed', () => {
+  if (isQuitting) {
+    app.quit();
+  }
+});
