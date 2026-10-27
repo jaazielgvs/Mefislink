@@ -1,0 +1,42 @@
+{
+  "name": "mefislink",
+  "productName": "Mefislink",
+  "version": "1.0.0",
+  "description": "Mefislink - 4 contas do jogo PokeIdle em uma janela só",
+  "main": "main.js",
+  "author": "Mefis",
+  "scripts": {
+    "start": "electron .",
+    "build:portable": "electron-builder --win portable",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.mefislink.app",
+    "productName": "Mefislink",
+    "afterPack": "./afterPack.js",
+    "asar": false,
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "icon": "icone.ico",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "Mefislink-Portable.exe"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "bar.html",
+      "icone.ico",
+      "icone.png",
+      "package.json"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8",
+    "rcedit": "^5.0.2"
+  }
+}
