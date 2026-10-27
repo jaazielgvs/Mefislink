@@ -6,8 +6,6 @@ Gerenciador multi-contas para o jogo [PokeIdle](https://pokeidle.io) com suporte
 
 ## 🚀 Novidades desta versão (Mefislink)
 
-- **Renomeação completa**: Todas as referências visuais e internas foram atualizadas para **Mefislink**.
-- **Remoção da Autocompra**: O serviço de autocompra no Market (poções, pokébolas e revives) foi completamente removido, garantindo conformidade com o seu estilo de jogo.
 - **Portabilidade Total**: Executável único pronto para envio (`Mefislink-Portable.exe`). Seus amigos não precisam instalar nada: basta dar dois cliques para abrir.
 - **Gerenciamento de Dados**:
   - Por padrão, cada computador salva os logins de forma segura e independente em `%APPDATA%\Mefislink`.
