@@ -506,7 +506,7 @@ function restartApp() {
   app.exit(0);
 }
 
-// Atualizações vêm num pacote ".plk" ASSINADO por você (veja assinar-atualizacao.js).
+// Atualizações vêm num pacote ".mlk" (ou ".plk") ASSINADO por você.
 // O app só instala pacotes cuja assinatura bate com esta chave pública, então ninguém além de você
 // consegue colocar código no Mefislink por esse menu. Esta linha é preenchida pelo script na 1ª vez.
 const UPDATE_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
@@ -568,7 +568,7 @@ async function applyUpdate() {
   const r = await dialog.showOpenDialog({
     title: 'Escolha o pacote de atualização do Mefislink',
     properties: ['openFile'],
-    filters: [{ name: 'Atualização do Mefislink', extensions: ['plk'] }],
+    filters: [{ name: 'Atualização do Mefislink', extensions: ['mlk', 'plk'] }],
   });
   if (r.canceled || !r.filePaths.length) return;
 
@@ -670,7 +670,7 @@ async function checkOnlineUpdate(manual) {
     const url = new URL(feed.file, UPDATE_FEED_URL).href;
     const pr = await withTimeout(ses.fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' }), 60000);
     if (!pr.ok) throw new Error('não consegui baixar o pacote (' + pr.status + ')');
-    const tmp = path.join(app.getPath('temp'), `mefislink-${feed.version}.plk`);
+    const tmp = path.join(app.getPath('temp'), `mefislink-${feed.version}.mlk`);
     fs.writeFileSync(tmp, Buffer.from(await pr.arrayBuffer()));
     let up;
     try { up = readUpdatePackage(tmp); } finally { try { fs.unlinkSync(tmp); } catch {} }
@@ -912,7 +912,7 @@ async function showAbout() {
     detail:
       'O Mefislink foi desenvolvido para melhorar a qualidade de vida de quem joga com 4 contas no mesmo computador, ' +
       'reunindo todas em uma única janela.\n\n' +
-      'O Mefislink é uma plataforma independente. Nations é o desenvolvedor do Mefislink, não do PokeIdle, ' +
+      'O Mefislink é uma plataforma independente. Mefis é o desenvolvedor do Mefislink, não do PokeIdle, ' +
       'e não tem vínculo com a equipe do jogo. Se preferir jogar sem a plataforma, use o site oficial: www.pokeidle.io',
     note: 'O uso de mais de 4 contas está sujeito a banimento no jogo. O Mefislink foi feito para no máximo 4 contas.',
     foot: 'Versão beta: se algo der errado, use Ajuda > Gerar relatório de erro.',
@@ -938,8 +938,8 @@ async function showRights() {
       'The Pokémon Company. O PokeIdle e seu conteúdo pertencem à equipe do PokeIdle.\n\n' +
       'O Mefislink não tem vínculo com nenhum deles. O jogo exibido nas janelas é carregado diretamente de ' +
       'www.pokeidle.io: o Mefislink não copia, hospeda nem distribui esse conteúdo.\n\n' +
-      'O código e a interface do Mefislink são de autoria de Nations.' + contato,
-    note: 'Funções automáticas, como a Auto Compra, podem não ser permitidas pelas regras do PokeIdle. ' +
+      'O código e a interface do Mefislink são de autoria de Mefis.' + contato,
+    note: 'O uso de extensões ou automações pode não ser permitido pelas regras do PokeIdle. ' +
       'Confira os termos do jogo antes de usar. O uso é por sua conta e risco.',
     buttons: ['Voltar', 'Fechar'],
     defaultId: 0,
@@ -1791,7 +1791,7 @@ ipcMain.on('live-page-open', (_, i, plat, c) => openLivePage(i, plat, String(c))
 
 // ---------- Extensões do Chrome dentro do Mefislink ----------
 // O Mefislink baixa cada extensão da Chrome Web Store no PC do usuário (não vem dentro do Mefislink),
-// guarda em %APPDATA%\pokeidle-multi\extensoes\<id> e carrega nas 4 contas. Atualizam sozinhas.
+// guarda em %APPDATA%\Mefislink\extensoes\<id> e carrega nas 4 contas. Atualizam sozinhas.
 // Para adicionar outra, basta incluir aqui o id dela (o código no fim do link da Chrome Web Store).
 const EXTENSIONS = [
   { id: 'mhnplloljgchpfpcpbhmcokmnefodjnh', nome: '/hunt for PokeIdle', autor: 'Liang',
@@ -2139,7 +2139,7 @@ async function captureTracker(i) {
 
 // ---------- PvP: histórico e análise dos duelos (dados do tracker do jogo) ----------
 // O tracker (pokeidle.io/tracker/j/<nick>) mostra só as últimas 20 partidas. O Mefislink lê o tracker
-// de cada conta de tempos em tempos e guarda cada partida nova em %APPDATA%\pokeidle-multi\pvp,
+// de cada conta de tempos em tempos e guarda cada partida nova em %APPDATA%\Mefislink\pvp,
 // montando um histórico maior para calcular vitórias/derrotas por adversário e dar sugestões.
 const PVP_EVERY_MIN = 15;
 const pvpDir = () => path.join(app.getPath('userData'), 'pvp');
@@ -2952,15 +2952,15 @@ const LOGIN_EXPORT_JS = `(async () => {
 
 // ---------- Termos de Uso (aceite obrigatório na 1ª vez e quando os termos mudarem) ----------
 // Mude TERMS_VERSION sempre que alterar o texto: todo mundo terá de aceitar de novo.
-const TERMS_VERSION = '1';
+const TERMS_VERSION = '2';
 const TERMS_TEXT = [
-  'TERMOS DE USO DO POKELINK',
+  'TERMOS DE USO DO MEFISLINK',
   '',
   '1. O que é o Mefislink',
-  'O Mefislink é um programa independente e não oficial, criado por Nations, que reúne contas do jogo PokeIdle em uma única janela. Ele não tem vínculo com a equipe do PokeIdle, com a Nintendo, Game Freak, Creatures, The Pokémon Company, Twitch, Kick ou Google. Todas as marcas citadas pertencem aos seus donos.',
+  'O Mefislink é um programa independente e não oficial, criado por Mefis, que reúne contas do jogo PokeIdle em uma única janela. Ele não tem vínculo com a equipe do PokeIdle, com a Nintendo, Game Freak, Creatures, The Pokémon Company, Twitch, Kick ou Google. Todas as marcas citadas pertencem aos seus donos.',
   '',
   '2. Uso por sua conta e risco',
-  'Funções automáticas (Auto Compra, abertura automática de lives, extensões e outras) podem não ser permitidas pelas regras do jogo ou das plataformas. Cabe a você conferir essas regras antes de usar. Advertências, suspensões, banimentos, perdas de itens, ouro, pontos ou progresso decorrentes do uso do Mefislink são de sua inteira responsabilidade.',
+  'Recursos de suporte (abertura de lives para drops de recompensas, extensões e integrações) podem estar sujeitos às regras do jogo ou das plataformas de transmissão. Cabe a você conferir essas regras antes de usar. Advertências, suspensões, banimentos, perdas de itens, ouro, pontos ou progresso decorrentes do uso do Mefislink são de sua inteira responsabilidade.',
   '',
   '3. Suas contas e a segurança delas',
   'Os logins que você faz no Mefislink (jogo, Twitch, Kick e outros) ficam guardados apenas no seu computador. O desenvolvedor não recebe, não armazena e não tem acesso às suas senhas ou sessões. A segurança das contas é responsabilidade sua, incluindo: manter o computador livre de vírus e programas maliciosos, não compartilhar senhas e não compartilhar os textos de login exportados pelo Mefislink (eles dão acesso à conta).',
