@@ -1,15 +1,17 @@
-# Mefislink
+# Mefislink — Master Link Edition
 
-Gerenciador multi-contas para o jogo [PokeIdle](https://pokeidle.io) com suporte a até 4 contas simultâneas em uma única janela.
+Gerenciador multi-contas de alta performance para o jogo [PokeIdle](https://pokeidle.io), com suporte a até 4 contas simultâneas em uma única janela integrada.
 
 ---
 
-## 🚀 Novidades da versão (v1.1)
+## 🚀 Novidades da versão (v1.1 - Master Link Visual Overhaul)
 
+- **Novo Ícone e Identidade Visual (Master Ball Edition)**: Ícone exclusivo inspirado na clássica e lendária **Master Ball**, unindo o "M" de Mefis e o núcleo de sincronismo das 4 contas. Embutido em alta resolução (.ico com 7 camadas) para o Windows, atalho e bandeja do sistema.
+- **Design System Iconsax Two-Tone**: Todos os menus suspensos, abas de contas e ferramentas agora utilizam a suíte vetorial **Iconsax Two-Tone**, entregando um acabamento elegante, moderno e consistente.
+- **Interface Dark Obsidian**: Paleta refinada (`#0b0f19` / `#0e1424`) com bordas suaves e sombras limpas, resultando em menor custo de repintura na GPU e acabamento visual de alto padrão.
 - **Minimizar para a Bandeja (Ícones Ocultos)**: Ao clicar no "X" para fechar, o Mefislink continua rodando em segundo plano sem interromper o farm das contas. Reabra com um clique no ícone da bandeja ou encerre através do botão direito > *Encerrar o Mefislink* (ou pelo menu *Ajuda > Encerrar*).
 - **Instância Única (Single Instance)**: Se tentar abrir o programa novamente enquanto ele estiver minimizado nos ícones ocultos, a janela atual é trazida para a frente automaticamente, evitando duplicatas.
-- **Barra Superior Mais Limpa**: Removida a aba de atualizações para simplificar o menu.
-- **Portabilidade Total**: Executável único pronto para envio (`Mefislink-Portable.exe`). Seus amigos não precisam instalar nada: basta dar dois cliques para abrir.
+- **Portabilidade Total**: Executável único pronto para envio (`Mefislink-v1.1.0-Portable.exe`). Não precisa instalar nada: basta dar dois cliques para abrir.
 - **Gerenciamento de Dados**:
   - Por padrão, cada computador salva os logins de forma segura e independente em `%APPDATA%\Mefislink`.
   - Se preferir usar em um Pendrive de forma 100% isolada, basta criar uma pasta chamada `mefislink-data` na mesma pasta do executável.

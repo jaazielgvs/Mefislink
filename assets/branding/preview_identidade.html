@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mefislink — Nova Identidade Visual & Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #07090e;
+      --bg-surface: #0e131f;
+      --bg-card: #141b2d;
+      --bg-elevated: #1a233a;
+      
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-light: rgba(255, 255, 255, 0.12);
+      --border-accent: rgba(99, 102, 241, 0.35);
+
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --purple: #a855f7;
+      --amber: #f59e0b;
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding-bottom: 80px;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background lights */
+    .ambient-glow {
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(56, 189, 248, 0.08) 40%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header & Hero */
+    header {
+      padding: 60px 0 40px;
+      text-align: center;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 9999px;
+      color: var(--primary-light);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .badge-pill .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulseDot 2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    h1 {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto 36px;
+    }
+
+    /* Hero Icon Grid */
+    .hero-icon-showcase {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 32px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      margin-bottom: 50px;
+      align-items: center;
+    }
+
+    .icon-preview-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 30%, #171f34, #0b0f19);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 28px;
+      position: relative;
+    }
+
+    .icon-preview-box img, .icon-preview-box svg {
+      width: 180px;
+      height: 180px;
+      border-radius: 40px;
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.25);
+      transition: transform 0.3s ease;
+    }
+
+    .icon-preview-box:hover img {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    .icon-meta {
+      margin-top: 18px;
+      text-align: center;
+    }
+
+    .icon-meta h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .icon-meta p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .brand-story {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .brand-story h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .brand-story p {
+      color: var(--text-muted);
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .ftag {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* SECTION 2: LIVE SIMULATION OF TOP BAR */
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 40px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title svg {
+      color: var(--primary-light);
+    }
+
+    .sim-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+      margin-bottom: 50px;
+    }
+
+    .sim-header {
+      background: #080b12;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sim-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .window-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .w-red { background: #ef4444; }
+    .w-yellow { background: #f59e0b; }
+    .w-green { background: #10b981; }
+
+    .sim-header-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-left: 10px;
+      font-family: var(--font-mono);
+    }
+
+    /* THE REIMAGINED MEFISLINK TOP CONTROL BAR */
+    .mefis-topbar {
+      background: rgba(14, 19, 31, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      user-select: none;
+    }
+
+    .tb-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tb-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-right: 12px;
+      border-right: 1px solid var(--border-subtle);
+      cursor: pointer;
+    }
+
+    .tb-brand img, .tb-brand svg {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+    }
+
+    .tb-brand-name {
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+
+    .tb-version {
+      font-size: 9px;
+      font-weight: 700;
+      background: var(--bg-card);
+      color: var(--primary-light);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    /* Account Tabs */
+    .acc-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .acc-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .acc-tab:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .acc-tab.active {
+      color: #fff;
+      background: var(--bg-card);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .acc-tab .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+    }
+
+    /* Toolbar Action Buttons (Iconsax Two-tone Powered) */
+    .tb-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 7px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tb-btn svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .tb-btn:hover {
+      color: #fff;
+      background: var(--bg-elevated);
+      border-color: var(--border-light);
+    }
+
+    .tb-btn.active-turbo {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.5);
+      color: #c7d2fe;
+    }
+
+    .tb-btn.active-autobuy {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #a7f3d0;
+    }
+
+    .tb-btn.active-stream {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #e9d5ff;
+    }
+
+    .tb-btn.active-stream .live-ping {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 6px #ef4444;
+      animation: pulseDot 1.2s infinite;
+    }
+
+    /* Simulated App Canvas Area */
+    .sim-canvas {
+      height: 280px;
+      background: #090c14;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .sim-game-slot {
+      background: #0d121f;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-faint);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      transition: all 0.2s ease;
+    }
+
+    .sim-game-slot.active {
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08), #0d121f);
+      color: var(--text-muted);
+    }
+
+    .sim-game-slot .slot-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .sim-game-slot .slot-status {
+      font-size: 11px;
+      color: var(--emerald);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* SECTION 3: ICONSAX TWO-TONE SET */
+    .icons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 50px;
+    }
+
+    .icon-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .icon-card:hover {
+      border-color: var(--border-accent);
+      background: var(--bg-card);
+      transform: translateY(-2px);
+    }
+
+    .icon-glyph-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      display: grid;
+      place-items: center;
+      color: var(--primary-light);
+      flex-shrink: 0;
+    }
+
+    .icon-glyph-box svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .icon-details h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .icon-details p {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .icon-details code {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--cyan);
+    }
+
+    /* Palette and Tokens */
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+
+    .swatch-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .swatch-color {
+      height: 60px;
+    }
+
+    .swatch-info {
+      padding: 10px 12px;
+    }
+
+    .swatch-info b {
+      display: block;
+      font-size: 12.5px;
+      color: #fff;
+    }
+
+    .swatch-info span {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Actions Footer */
+    .actions-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .actions-bar-text h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .actions-bar-text p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .btn-action {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background: #4f46e5;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <div class="container">
+    <header>
+      <div class="badge-pill">
+        <span class="pulse-dot"></span>
+        Pokémon Master Ball Edition • Mefislink v1.2 Rebranding
+      </div>
+      <h1>Mefislink: The Master Link</h1>
+      <p class="subtitle">
+        Identidade visual autêntica inspirada na lendária <b>Master Ball</b> do universo Pokémon, unindo o 'M' de Mefis e o poder de gerenciar 4 contas simultâneas do PokeIdle.
+      </p>
+    </header>
+
+    <!-- SECTION 1: MASTER ICON SHOWCASE -->
+    <div class="hero-icon-showcase">
+      <div class="icon-preview-box">
+        <img src="icone_512.png" alt="Mefislink Master Ball Icon" id="masterIconImg">
+        <div class="icon-meta">
+          <h3>Mefislink Master Ball Icon</h3>
+          <p>Multi-resolution .ICO (16..256px) & 512px PNG</p>
+        </div>
+      </div>
+
+      <div class="brand-story">
+        <h2>DNA Pokémon Autêntico: A Master Ball de Mefis</h2>
+        <p>
+          Eliminando qualquer ar artificial de "tech genérico", a nova identidade resgata o coração do <b>PokeIdle</b>: a <b>Master Ball</b> — a Pokébola mais icônica, rara e prestigiosa de todo o universo Pokémon.
+        </p>
+        <p>
+          O design funde a emblemática letra <b>"M"</b> (que naturalmente já existe na Master Ball e representa perfeitamente o <b>Mefislink</b>) na cúpula violeta real com seus relevos magenta laterais, base em titânio pérola e o botão central de liberação com os 4 nós de sincronismo multi-contas.
+        </p>
+        <div class="feature-tags">
+          <div class="ftag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3"/></svg>
+            100% DNA Pokémon (Master Ball)
+          </div>
+          <div class="ftag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            Padrão Iconsax Two-Tone
+          </div>
+          <div class="ftag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+            Objeto Tátil & Físico (Sem IA Genérica)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: LIVE SIMULATED TOP BAR -->
+    <div class="section-title">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+      Simulação Interativa: Nova Barra de Controle (Top Bar)
+    </div>
+
+    <div class="sim-card">
+      <div class="sim-header">
+        <div class="sim-header-left">
+          <div class="window-dot w-red"></div>
+          <div class="window-dot w-yellow"></div>
+          <div class="window-dot w-green"></div>
+          <span class="sim-header-title">Mefislink v1.2.0 — Multi-Account PokeIdle Workspace</span>
+        </div>
+        <div style="font-size: 11px; color: #64748b; font-family: var(--font-mono);">Tray Active • Single Instance Guard</div>
+      </div>
+
+      <!-- THE REIMAGINED TOP BAR -->
+      <div class="mefis-topbar">
+        <!-- Brand identity -->
+        <div class="tb-brand" title="Mefislink Quantum">
+          <img src="icone_512.png" alt="Icon">
+          <span class="tb-brand-name">Mefislink</span>
+          <span class="tb-version">v1.2</span>
+        </div>
+
+        <!-- 4 Multi-Account Tabs -->
+        <div class="acc-tabs">
+          <div class="acc-tab active" onclick="selectTab(0, this)">
+            <span class="dot"></span>
+            <span>Conta 1</span>
+          </div>
+          <div class="acc-tab" onclick="selectTab(1, this)">
+            <span class="dot"></span>
+            <span>Conta 2</span>
+          </div>
+          <div class="acc-tab" onclick="selectTab(2, this)">
+            <span class="dot"></span>
+            <span>Conta 3</span>
+          </div>
+          <div class="acc-tab" onclick="selectTab(3, this)">
+            <span class="dot"></span>
+            <span>Conta 4</span>
+          </div>
+        </div>
+
+        <!-- Action tools -->
+        <div class="tb-group">
+          <!-- Performance Mode -->
+          <button class="tb-btn active-turbo" id="perfBtn" onclick="togglePerf()" title="Alternar perfil de economia ou alto rendimento">
+            <!-- Iconsax Two-tone Performance Turbo -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path opacity="0.4" d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 12L15.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="2" fill="currentColor"/>
+              <path opacity="0.4" d="M6 12H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path opacity="0.4" d="M12 6V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M16 12H18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span id="perfLabel">Turbo Mode</span>
+          </button>
+
+          <!-- Auto Compra -->
+          <button class="tb-btn active-autobuy" id="autoBtn" onclick="toggleAuto()" title="Automação de mercado inteligente">
+            <!-- Iconsax Two-tone Auto Buyer -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path opacity="0.4" d="M2 2H3.74001C4.82001 2 5.67 2.93 5.58 4L4.75 13.96C4.61 15.59 5.89999 16.99 7.53999 16.99H18.19C19.63 16.99 20.89 15.81 21 14.38L21.54 6.88C21.66 5.22 20.4 3.87 18.73 3.87H5.82001" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13 7L11 10H14L12 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="16.25" cy="20.5" r="1.5" fill="currentColor"/>
+              <circle cx="8.25" cy="20.5" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>Auto Compra</span>
+          </button>
+
+          <!-- Kick / Twitch Radar -->
+          <button class="tb-btn active-stream" id="streamBtn" onclick="toggleStream()" title="Farm automático de Drops & Pontos Kick">
+            <span class="live-ping"></span>
+            <!-- Iconsax Two-tone Stream Radar -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+              <path opacity="0.4" d="M16.24 7.76C18.58 10.1 18.58 13.9 16.24 16.24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path opacity="0.4" d="M7.76 16.24C5.42 13.9 5.42 10.1 7.76 7.76" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19.07 4.93C22.98 8.84 22.98 15.16 19.07 19.07" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4.93 19.07C1.02 15.16 1.02 8.84 4.93 4.93" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Kick Farm (Live)</span>
+          </button>
+
+          <!-- System Tray Guard -->
+          <button class="tb-btn" title="Minimizar para a bandeja do Windows">
+            <!-- Iconsax Two-tone Tray Guard -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.49 2.23C11.43 1.92 12.57 1.92 13.51 2.23L18.23 3.8C20.05 4.41 21.2 6.13 21.2 8.05V13.88C21.2 18.17 17.5 21.73 13.23 22.15C12.42 22.23 11.58 22.23 10.77 22.15C6.5 21.73 2.8 18.17 2.8 13.88V8.05C2.8 6.13 3.95 4.41 5.77 3.8L10.49 2.23Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path opacity="0.4" d="M8 12L12 16L16 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path opacity="0.4" d="M12 8V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- App Canvas Preview (4 Accounts Matrix) -->
+      <div class="sim-canvas">
+        <div class="sim-game-slot active" id="slot-0">
+          <span class="slot-title">Conta 1 (Principal)</span>
+          <div class="slot-status">● Sincronizado (60 FPS)</div>
+          <small>PokeIdle #1 • Auto-buyer ativo</small>
+        </div>
+        <div class="sim-game-slot" id="slot-1">
+          <span class="slot-title">Conta 2</span>
+          <div class="slot-status">● Em background (30 FPS)</div>
+          <small>PokeIdle #2 • Kick Points ativo</small>
+        </div>
+        <div class="sim-game-slot" id="slot-2">
+          <span class="slot-title">Conta 3</span>
+          <div class="slot-status">● Em background (30 FPS)</div>
+          <small>PokeIdle #3 • Standby</small>
+        </div>
+        <div class="sim-game-slot" id="slot-3">
+          <span class="slot-title">Conta 4</span>
+          <div class="slot-status">● Em background (30 FPS)</div>
+          <small>PokeIdle #4 • Standby</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: SUÍTE DE ÍCONES ICONSAX TWO-TONE -->
+    <div class="section-title">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+      Suíte Iconsax Two-Tone: Catálogo de Ícones do Sistema (24x24)
+    </div>
+
+    <div class="icons-grid">
+      <!-- Icon 1 -->
+      <div class="icon-card">
+        <div class="icon-glyph-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path opacity="0.4" d="M7.5 14C5.57 14 4 12.43 4 10.5C4 8.57 5.57 7 7.5 7C9.13 7 10.5 8.12 10.88 9.63" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path opacity="0.4" d="M16.5 14C18.43 14 20 12.43 20 10.5C20 8.57 18.43 7 16.5 7C14.87 7 13.5 8.12 13.12 9.63" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6.5 17V10C6.5 8.34 7.84 7 9.5 7C10.6 7 11.55 7.6 12 8.47C12.45 7.6 13.4 7 14.5 7C16.16 7 17.5 8.34 17.5 10V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 13.5C10.5 15.5 13.5 15.5 15 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="6.5" cy="9.5" r="1.2" fill="currentColor"/>
+            <circle cx="17.5" cy="9.5" r="1.2" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="icon-details">
+          <h4>Mefislink Mark</h4>
+          <p>Ícone mestre de marca</p>
+          <code>mefislink-mark.svg</code>
+        </div>
+      </div>
+
+      <!-- Icon 2 -->
+      <div class="icon-card">
+        <div class="icon-glyph-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="8" height="8" rx="2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect opacity="0.4" x="13" y="3" width="8" height="8" rx="2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect opacity="0.4" x="3" y="13" width="8" height="8" rx="2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="13" y="13" width="8" height="8" rx="2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-details">
+          <h4>Quad Matrix</h4>
+          <p>4 Contas Conectadas</p>
+          <code>matrix-quad.svg</code>
+        </div>
+      </div>
+
+      <!-- Icon 3 -->
+      <div class="icon-card">
+        <div class="icon-glyph-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path opacity="0.4" d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 12L15.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="icon-details">
+          <h4>Performance Turbo</h4>
+          <p>Seletor de Desempenho</p>
+          <code>performance-turbo.svg</code>
+        </div>
+      </div>
+
+      <!-- Icon 4 -->
+      <div class="icon-card">
+        <div class="icon-glyph-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path opacity="0.4" d="M2 2H3.74001C4.82001 2 5.67 2.93 5.58 4L4.75 13.96C4.61 15.59 5.89999 16.99 7.53999 16.99H18.19C19.63 16.99 20.89 15.81 21 14.38L21.54 6.88C21.66 5.22 20.4 3.87 18.73 3.87H5.82001" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 7L11 10H14L12 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16.25" cy="20.5" r="1.5" fill="currentColor"/>
+            <circle cx="8.25" cy="20.5" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="icon-details">
+          <h4>Auto Buyer</h4>
+          <p>Compras Automatizadas</p>
+          <code>auto-buyer.svg</code>
+        </div>
+      </div>
+
+      <!-- Icon 5 -->
+      <div class="icon-card">
+        <div class="icon-glyph-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+            <path opacity="0.4" d="M16.24 7.76C18.58 10.1 18.58 13.9 16.24 16.24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path opacity="0.4" d="M7.76 16.24C5.42 13.9 5.42 10.1 7.76 7.76" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19.07 4.93C22.98 8.84 22.98 15.16 19.07 19.07" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4.93 19.07C1.02 15.16 1.02 8.84 4.93 4.93" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-details">
+          <h4>Stream Radar</h4>
+          <p>Lives Kick & Twitch</p>
+          <code>stream-radar.svg</code>
+        </div>
+      </div>
+
+      <!-- Icon 6 -->
+      <div class="icon-card">
+        <div class="icon-glyph-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.49 2.23C11.43 1.92 12.57 1.92 13.51 2.23L18.23 3.8C20.05 4.41 21.2 6.13 21.2 8.05V13.88C21.2 18.17 17.5 21.73 13.23 22.15C12.42 22.23 11.58 22.23 10.77 22.15C6.5 21.73 2.8 18.17 2.8 13.88V8.05C2.8 6.13 3.95 4.41 5.77 3.8L10.49 2.23Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path opacity="0.4" d="M8 12L12 16L16 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path opacity="0.4" d="M12 8V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-details">
+          <h4>Tray Guard</h4>
+          <p>Minimizar p/ Bandeja</p>
+          <code>tray-guard.svg</code>
+        </div>
+      </div>
+
+      <!-- Icon 7 -->
+      <div class="icon-card">
+        <div class="icon-glyph-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect opacity="0.4" x="3" y="4" width="18" height="16" rx="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 10L10 12L7 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 14H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-details">
+          <h4>Terminal Diag</h4>
+          <p>Diagnósticos e Logs</p>
+          <code>terminal-diag.svg</code>
+        </div>
+      </div>
+
+      <!-- Icon 8 -->
+      <div class="icon-card">
+        <div class="icon-glyph-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 12C22 17.52 17.52 22 12 22C6.48 22 3.11 16.44 3.11 16.44M3.11 16.44H7.64M3.11 16.44V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path opacity="0.4" d="M2 12C2 6.48 6.44 2 12 2C18.67 2 22 7.56 22 7.56M22 7.56V3M22 7.56H17.56" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-details">
+          <h4>Sync Cycle</h4>
+          <p>Sincronismo em Tempo Real</p>
+          <code>refresh-sync.svg</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: COLOR PALETTE -->
+    <div class="section-title">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 3v18"/>
+        <path d="M12 12h9"/>
+      </svg>
+      Paleta Cromática & Design Tokens (Dark Obsidian)
+    </div>
+
+    <div class="palette-grid">
+      <div class="swatch-card">
+        <div class="swatch-color" style="background: #07090e;"></div>
+        <div class="swatch-info">
+          <b>Obsidian Base</b>
+          <span>#07090E</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background: #141b2d;"></div>
+        <div class="swatch-info">
+          <b>Card Surface</b>
+          <span>#141B2D</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background: #6366f1;"></div>
+        <div class="swatch-info">
+          <b>Electric Indigo</b>
+          <span>#6366F1</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background: #38bdf8;"></div>
+        <div class="swatch-info">
+          <b>Cyan Nexus</b>
+          <span>#38BDF8</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background: #10b981;"></div>
+        <div class="swatch-info">
+          <b>Pulse Emerald</b>
+          <span>#10B981</span>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background: #a855f7;"></div>
+        <div class="swatch-info">
+          <b>Hyper Violet</b>
+          <span>#A855F7</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER ACTIONS -->
+    <div class="actions-bar">
+      <div class="actions-bar-text">
+        <h3>Pronto para integração no aplicativo</h3>
+        <p>Os arquivos <b>icone.png</b> e <b>icone.ico</b> já estão atualizados na raiz do projeto prontos para o executável.</p>
+      </div>
+      <button class="btn-action" onclick="alert('Abra bar.html quando desejar aplicar o visual final!')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+        Identidade Aprovada
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function selectTab(idx, el) {
+      document.querySelectorAll('.acc-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+
+      document.querySelectorAll('.sim-game-slot').forEach(s => s.classList.remove('active'));
+      const activeSlot = document.getElementById('slot-' + idx);
+      if (activeSlot) activeSlot.classList.add('active');
+    }
+
+    const perfModes = ['Eco Saver (15 FPS)', 'Equilibrado (30 FPS)', 'Turbo Mode (60 FPS)', 'Ultra Max (Sem limite)'];
+    let currentPerf = 2;
+    function togglePerf() {
+      currentPerf = (currentPerf + 1) % perfModes.length;
+      document.getElementById('perfLabel').innerText = perfModes[currentPerf];
+    }
+
+    function toggleAuto() {
+      const btn = document.getElementById('autoBtn');
+      btn.classList.toggle('active-autobuy');
+    }
+
+    function toggleStream() {
+      const btn = document.getElementById('streamBtn');
+      btn.classList.toggle('active-stream');
+    }
+  </script>
+</body>
+</html>

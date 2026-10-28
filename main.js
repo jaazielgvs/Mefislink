@@ -114,8 +114,8 @@ function applyWindowIcon() {
 const BAR_H = 38;
 // barra de título customizada (substitui a barra de menu nativa do Windows)
 const TITLE_H = 34;
-const TITLE_BG = '#3a1820';   // precisa ser cor sólida: é a mesma dos botões min/max/fechar
-const TITLE_FG = '#ffdef0';
+const TITLE_BG = '#0b0f19';   // Dark Obsidian: combina com a nova barra de controle
+const TITLE_FG = '#f8fafc';
 let titleBar = null;
 let menuOpen = false; // com um menu aberto, a barra de título cobre a janela toda (transparente)
 let appMenu = null;
@@ -1696,7 +1696,7 @@ ipcMain.on('lives-set', (_, i, plat, on) => {
 function openLiveLogin(i, plat, enableAfter) {
   const w = new BrowserWindow({
     width: 560, height: 780, title: `${PLAT[plat].name} — ${nameOf(i)}`,
-    backgroundColor: '#24101a', autoHideMenuBar: true,
+    backgroundColor: '#0e1424', autoHideMenuBar: true,
     ...(customIconPath() ? { icon: customIconPath() } : {}),
     webPreferences: { partition: `persist:conta${i + 1}` },
   });
@@ -1950,7 +1950,7 @@ function openExtPage(i, id) {
   }
   const w = new BrowserWindow({
     width: grande ? 1180 : 460, height: grande ? 800 : 700, minWidth: 320, minHeight: 400, title: `${def.botao || def.nome} — ${nameOf(i)}`,
-    backgroundColor: '#24101a', autoHideMenuBar: true,
+    backgroundColor: '#0e1424', autoHideMenuBar: true,
     ...(customIconPath() ? { icon: customIconPath() } : {}),
     webPreferences: { session: ses },
   });
@@ -2429,7 +2429,7 @@ function openPvp(i) {
   if (pvpWin && !pvpWin.isDestroyed()) { pvpWin.webContents.send('pvp-account', i); pvpWin.show(); pvpWin.focus(); return; }
   pvpWin = new BrowserWindow({
     width: 1100, height: 820, minWidth: 760, minHeight: 560, title: 'PvP — Mefislink',
-    backgroundColor: '#24101a', autoHideMenuBar: true,
+    backgroundColor: '#0e1424', autoHideMenuBar: true,
     titleBarStyle: 'hidden', titleBarOverlay: { color: TITLE_BG, symbolColor: TITLE_FG, height: TITLE_H },
     ...(customIconPath() ? { icon: customIconPath() } : {}),
     webPreferences: { preload: path.join(__dirname, 'preload.js') },
@@ -2760,7 +2760,7 @@ function openKickWin() {
   if (kickWin && !kickWin.isDestroyed()) { kickWin.show(); kickWin.focus(); return; }
   kickWin = new BrowserWindow({
     width: 980, height: 760, minWidth: 640, minHeight: 480, title: 'Pontos da Kick — Mefislink',
-    backgroundColor: '#24101a', autoHideMenuBar: true,
+    backgroundColor: '#0e1424', autoHideMenuBar: true,
     titleBarStyle: 'hidden', titleBarOverlay: { color: TITLE_BG, symbolColor: TITLE_FG, height: TITLE_H },
     ...(customIconPath() ? { icon: customIconPath() } : {}),
     webPreferences: { preload: path.join(__dirname, 'preload.js') },
