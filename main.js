@@ -1859,9 +1859,32 @@ async function downloadExt(id) {
   if (fs.existsSync(path.join(dir, 'manifest.json'))) fs.rmSync(tmp, { recursive: true, force: true });
   else { fs.rmSync(dir, { recursive: true, force: true }); fs.renameSync(tmp, dir); }
   for (const v of fs.readdirSync(extRoot(id))) if (v !== version) fs.rmSync(path.join(extRoot(id), v), { recursive: true, force: true });
+  sanitizeExt(dir);
   return { id, version, dir };
 }
+function sanitizeExt(dir) {
+  try {
+    const uiJs = path.join(dir, 'src', 'ui.js');
+    if (fs.existsSync(uiJs)) {
+      let code = fs.readFileSync(uiJs, 'utf8');
+      if (code.includes('pih-apoiar') || code.includes('blocoApoio()')) {
+        code = code.replace(/<button type="button" class="pih-btn pih-apoiar"[\s\S]*?<\/button>\s*/, '');
+        code = code.replace(/\$\{blocoApoio\(\)\}/g, '');
+        fs.writeFileSync(uiJs, code, 'utf8');
+      }
+    }
+    const uiCss = path.join(dir, 'src', 'ui.css');
+    if (fs.existsSync(uiCss)) {
+      let css = fs.readFileSync(uiCss, 'utf8');
+      if (!css.includes('.pih-apoiar')) {
+        css += '\n.pih-cab .pih-apoiar, #pih-apoio, .pih-apoiar { display: none !important; }\n';
+        fs.writeFileSync(uiCss, css, 'utf8');
+      }
+    }
+  } catch {}
+}
 async function loadExtInto(ext) {
+  sanitizeExt(ext.dir);
   const st = extState[ext.id];
   for (let i = 0; i < ACCOUNTS.length; i++) {
     const api = (() => { const ses = session.fromPartition(`persist:conta${i + 1}`); return ses.extensions || ses; })();
@@ -3104,6 +3127,7 @@ function createWindow() {
     view.webContents.on('dom-ready', () => {
       ecoCss[i] = null;
       applyLevel(i);
+      view.webContents.insertCSS('.pih-cab .pih-apoiar, #pih-apoio, .pih-apoiar { display: none !important; }').catch(() => {});
       view.webContents.executeJavaScript(`
         try {
           Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
