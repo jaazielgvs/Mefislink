@@ -16,12 +16,12 @@ Gerenciador multi-contas para o jogo [PokeIdle](https://pokeidle.io) com suporte
 
 ---
 
-## 📦 Como Compartilhar com Amigos
+## 📦 Download e Como Compartilhar
 
-O arquivo pronto para envio está localizado em:
-`dist/Mefislink-Portable.exe`
+Você e seus amigos podem baixar o executável pronto diretamente nas Releases do GitHub:
+👉 **[Baixar Mefislink v1.1.0 Portable (Releases)](https://github.com/jaazielgvs/Mefislink/releases/latest)**
 
-Basta enviar esse arquivo (via Google Drive, Discord, Telegram, etc.) para os seus amigos. Eles só precisam executar o arquivo e fazer login com as 4 contas normalmente.
+Não precisa instalar nada! Basta baixar o arquivo `Mefislink-v1.1.0-Portable.exe`, dar dois cliques para abrir e fazer login com as 4 contas normalmente. Também é possível compartilhar o executável diretamente via Discord, Drive ou Telegram.
 
 ---
 
