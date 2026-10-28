@@ -73,7 +73,7 @@ const ACCOUNTS = ['Conta 1', 'Conta 2', 'Conta 3', 'Conta 4'];
 
 // ====== VERSÃO ======
 const APP_NAME = 'Mefislink';
-const APP_VERSION = '1.1';
+const APP_VERSION = '1.1.2';
 const APP_CHANNEL = '';
 // Contato para pedidos de remoção (aparece em "Direitos e marcas"). Ex.: 'contato@seudominio.com'
 // Enquanto estiver vazio, esse trecho não é exibido.
@@ -240,7 +240,11 @@ function layout() {
     const bottom = barPos(i) === 'bottom';
     bars[i].setVisible(true);
     bars[i].setBounds({ x, y: bottom ? y + bh - BAR_H : y, width: bw, height: BAR_H });
-    if (level[i] === 3) { detachView(i); return; } // hibernando: só a barra fica
+    if (level[i] === 3) {
+      detachView(i);
+      try { v.setVisible(false); } catch {}
+      return;
+    } // hibernando: só a barra fica
     attachView(i);
     v.setVisible(true);
     v.setBounds({ x, y: bottom ? y : y + BAR_H, width: bw, height: bh - BAR_H });
@@ -265,6 +269,7 @@ function attachView(i) {
   if (attached[i]) return;
   win.contentView.addChildView(views[i]);
   attached[i] = true;
+  if (bars && bars[i]) win.contentView.addChildView(bars[i]);
   // a barra de título (menus e pop-ups) precisa continuar por cima de tudo
   if (titleBar) win.contentView.addChildView(titleBar);
 }
@@ -322,7 +327,8 @@ async function applyLevel(i, waking) {
     // Depois de hibernar, o jogo pode não voltar a se desenhar sozinho (tela vazia).
     // Recarregar a conta garante que ela volta funcionando; o nível é reaplicado no dom-ready.
     ecoCss[i] = null;
-    wc.reload();
+    try { wc.invalidate(); } catch {}
+    reloadAccount(i);
     return;
   }
   if (lv !== 3) { try { wc.invalidate(); } catch {} } // força redesenhar
@@ -478,6 +484,11 @@ const loading = ACCOUNTS.map(() => false);
 function reloadAccount(i) {
   const wc = views[i] && views[i].webContents;
   if (!wc || wc.isDestroyed()) return;
+  // Se a conta estiver em modo Hibernar (tela escondida), recarregar acorda a conta e volta para o modo Normal
+  if (level[i] === 3) {
+    setLevel(i, 0);
+    return;
+  }
   let started = false;
   const onStart = () => { started = true; };
   wc.once('did-start-loading', onStart);

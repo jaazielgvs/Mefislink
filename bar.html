@@ -1917,7 +1917,7 @@
     });
     const busy = !!(loading && loading[I]);
     right.appendChild(el('button', 'btn icon' + (busy ? ' spin' : ''), SVG.reload,
-      busy ? 'Carregando...' : 'Recarregar esta conta', () => window.api.reload(I)));
+      busy ? 'Carregando...' : (level[I] === 3 ? 'Recarregar (acordar conta)' : 'Recarregar esta conta'), () => window.api.reload(I)));
     right.appendChild(el('button', 'btn icon', muted && muted[I] ? SVG.off : SVG.on,
       muted && muted[I] ? 'Som desligado (clique para ligar)' : 'Som ligado (clique para silenciar)', () => window.api.toggleMute(I)));
     right.appendChild(zoomed
