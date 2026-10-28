@@ -23,7 +23,7 @@
       "signAndEditExecutable": false
     },
     "portable": {
-      "artifactName": "Mefislink-Portable.exe"
+      "artifactName": "Mefislink-v1.1.0-Portable.exe"
     },
     "files": [
       "main.js",
