@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Calculadora de Pokémon - Mefislink</title>
+  <style>
+    :root {
+      --skin-bg: #0b131f;
+      --skin-panel: #121d2d;
+      --skin-border: #23364f;
+      --skin-input: #0c1524;
+      --skin-text: #e2eaf5;
+      --skin-muted: #8ea5bd;
+      --skin-active: #78d9bc;
+      --skin-active-text: #0b221a;
+      --skin-glow: rgba(120, 217, 188, 0.22);
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background: var(--skin-bg); color: var(--skin-text);
+      font-family: var(--font); user-select: none;
+    }
+    body { display: flex; flex-direction: column; overflow: hidden; }
+
+    /* Top titlebar - 150px padding-right to avoid Windows titleBarOverlay buttons */
+    .titlebar {
+      flex: none; display: flex; align-items: center; justify-content: space-between;
+      height: 34px; padding: 0 150px 0 14px; background: #080f1a;
+      border-bottom: 1px solid var(--skin-border); -webkit-app-region: drag;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 8px; flex: none; }
+    .brand svg { width: 18px; height: 18px; display: block; fill: none; }
+    .brand b { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: 0.3px; }
+    .brand small { font-size: 11px; color: var(--skin-active); font-weight: 600; padding: 2px 7px; border-radius: 4px; background: rgba(120, 217, 188, 0.12); }
+    
+    .header-center { display: flex; align-items: center; gap: 10px; -webkit-app-region: no-drag; }
+    .account-tabs { display: flex; align-items: center; gap: 6px; }
+    .acc-tab {
+      height: 26px; padding: 0 10px; font-size: 11px; font-weight: 700; color: var(--skin-muted);
+      background: #111c2e; border: 1px solid var(--skin-border); border-radius: 6px; cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .acc-tab:hover { color: #fff; background: #1a2a44; border-color: rgba(120, 217, 188, 0.4); }
+    .acc-tab.active { color: var(--skin-active-text); background: var(--skin-active); border-color: var(--skin-active); box-shadow: 0 0 10px rgba(120, 217, 188, 0.45); }
+
+    .btn-sync {
+      display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px;
+      font-family: inherit; font-size: 11px; font-weight: 700; color: #d7e4f2;
+      background: #16243a; border: 1px solid var(--skin-border); border-radius: 6px; cursor: pointer;
+      -webkit-app-region: no-drag; transition: all 0.15s ease; flex-shrink: 0; white-space: nowrap;
+    }
+    .btn-sync:hover { background: #1d304e; color: #fff; border-color: var(--skin-active); }
+    .btn-sync:active { transform: translateY(1px); }
+
+    /* Main container */
+    .calc-container {
+      flex: 1; display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; padding: 18px 22px;
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .calc-container::-webkit-scrollbar { width: 6px; }
+    .calc-container::-webkit-scrollbar-thumb { background: #23364f; border-radius: 3px; }
+
+    /* Form Section */
+    .calc-left { display: flex; flex-direction: column; gap: 12px; }
+    .field-label { display: block; font-size: 11.5px; font-weight: 700; color: var(--skin-muted); margin-bottom: 5px; }
+
+    input:not([type=checkbox]), select {
+      width: 100%; height: 36px; padding: 0 10px; font-family: inherit; font-size: 12px; font-weight: 600;
+      color: var(--skin-text); background: var(--skin-input); border: 1px solid var(--skin-border); border-radius: 7px;
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus, select:focus {
+      border-color: var(--skin-active); box-shadow: 0 0 0 2px rgba(120, 217, 188, 0.25);
+    }
+
+    .species-row, .team-row { display: flex; flex-direction: column; }
+
+    .basics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .basics-card {
+      padding: 10px 12px; background: var(--skin-panel); border: 1px solid var(--skin-border); border-radius: 9px;
+    }
+    .basics-card.level { border-top: 3px solid #38bdf8; }
+    .basics-card.quality { border-top: 3px solid #7bd8b3; }
+    .basics-card.power { border-top: 3px solid #e8bd70; }
+    .basics-card.shiny { border-top: 3px solid #db9ff0; display: flex; flex-direction: column; justify-content: space-between; }
+    .shiny-box { display: flex; align-items: center; gap: 8px; height: 36px; cursor: pointer; }
+    .shiny-box input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--skin-active); cursor: pointer; }
+    .shiny-box span { font-size: 12px; font-weight: 700; color: #ebd8fc; }
+
+    .iv-title { font-size: 12.5px; font-weight: 800; color: #fff; margin: 4px 0 2px; }
+    .ivs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .iv-card {
+      padding: 8px 10px; background: var(--skin-panel); border: 1px solid var(--skin-border);
+      border-radius: 8px; border-top: 2px solid #87c7bd;
+    }
+    .iv-card.hp { border-top-color: #87c7bd; }
+    .iv-card.atk { border-top-color: #f3aa79; }
+    .iv-card.def { border-top-color: #87c7bd; }
+    .iv-card.spatk { border-top-color: #c0a1ff; }
+    .iv-card.spdef { border-top-color: #87c7bd; }
+    .iv-card.speed { border-top-color: #e8cb7c; }
+
+    /* IV Warnings - matching IdleBoard exact styling */
+    .io-calc-iv-warnings {
+      margin-top: 6px; padding: 13px 14px;
+      border: 1px solid rgba(230, 171, 101, 0.5); border-left: 4px solid #edb86c;
+      border-radius: 9px; background: color-mix(in srgb, var(--skin-panel) 88%, #e8a048 12%);
+    }
+    .io-calc-iv-warnings h3 {
+      font-size: 13.5px; font-weight: 800; margin: 0 0 10px; color: #ffd294; line-height: 1.4;
+    }
+    .io-calc-iv-warnings > div {
+      padding: 9px 11px; margin: 7px 0; border-radius: 7px;
+      border: 1px solid rgba(225, 173, 101, 0.25); background: var(--skin-input);
+    }
+    .io-calc-iv-warnings strong {
+      font-size: 12px; line-height: 1.5; color: #ffcd86; font-weight: 750; display: block;
+    }
+    .io-calc-iv-warnings > div small {
+      margin-top: 4px; font-size: 11px; line-height: 1.6; color: #eaf2ff; display: block;
+    }
+    .io-calc-iv-warnings > small {
+      font-size: 11px; line-height: 1.6; margin-top: 9px; display: block; color: var(--skin-muted);
+    }
+
+    .btn-calc {
+      height: 40px; margin-top: 4px; font-family: inherit; font-size: 13.5px; font-weight: 800;
+      color: var(--skin-active-text); background: var(--skin-active); border: none; border-radius: 8px; cursor: pointer;
+      box-shadow: 0 2px 10px rgba(120, 217, 188, 0.35); transition: all 0.15s ease;
+    }
+    .btn-calc:hover { background: #89e4c9; filter: brightness(1.06); box-shadow: 0 3px 16px rgba(120, 217, 188, 0.5); }
+    .btn-calc:active { transform: translateY(1px); }
+    .btn-calc:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Result Section */
+    .calc-right {
+      background: var(--skin-panel); border: 1px solid var(--skin-border); border-radius: 12px; padding: 18px;
+      display: flex; flex-direction: column; gap: 14px; min-height: 450px;
+    }
+    .empty-state {
+      flex: 1; display: grid; place-items: center; text-align: center; color: var(--skin-muted); font-size: 13px; font-weight: 600;
+    }
+
+    /* Hero Grade Card */
+    .io-calc-hero {
+      display: grid; grid-template-columns: 68px 1fr; align-items: center; column-gap: 12px;
+      padding: 12px 14px; border-radius: 10px;
+      --grade: #7bd49a;
+      border: 1px solid color-mix(in srgb, var(--grade) 45%, transparent);
+      background: radial-gradient(ellipse at top, color-mix(in srgb, var(--grade) 18%, transparent), transparent 80%);
+    }
+    .io-calc-hero[data-grade="extremamente-fraco"] { --grade: #b5bdc7; }
+    .io-calc-hero[data-grade="fraco"] { --grade: #f28d8d; }
+    .io-calc-hero[data-grade="mediano"] { --grade: #f4b16c; }
+    .io-calc-hero[data-grade="razoavel"] { --grade: #f4b16c; }
+    .io-calc-hero[data-grade="bom"] { --grade: #a8e99c; }
+    .io-calc-hero[data-grade="forte"] { --grade: #62e5aa; }
+    .io-calc-hero[data-grade="poderoso"], .io-calc-hero[data-grade="mitico"] { --grade: #c9a0ff; }
+    .io-calc-hero[data-grade="legendario"], .io-calc-hero[data-grade="divino"], .io-calc-hero[data-grade="Inestimável"] { --grade: #f3a9d9; }
+
+    .io-calc-hero img { grid-column: 1; grid-row: 1/4; width: 64px; height: 64px; object-fit: contain; image-rendering: pixelated; }
+    .io-calc-hero h3 { grid-column: 2; margin: 0 !important; font-size: 17px !important; font-weight: 800; color: #fff; }
+    .io-calc-hero .io-calc-score {
+      grid-column: 2; font-size: 26px; font-weight: 800; color: var(--grade); margin: 2px 0 !important;
+      text-shadow: 0 0 20px color-mix(in srgb, var(--grade) 25%, transparent);
+    }
+    .io-calc-hero > span { grid-column: 2; font-size: 12px; font-weight: 750; color: var(--grade); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Metrics Grid */
+    .io-calc-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0; }
+    .io-calc-metrics > div { padding: 10px 12px; background: var(--skin-input); border-radius: 8px; }
+    .io-calc-metrics > div:nth-child(1) { border-left: 3px solid #86dcb3; }
+    .io-calc-metrics > div:nth-child(2) { border-left: 3px solid #e8cb7c; }
+    .io-calc-metrics > div:nth-child(3) { border-left: 3px solid #8fbaff; }
+    .io-calc-metrics > div:nth-child(4) { border-left: 3px solid #cc9fea; }
+    .io-calc-metrics small { display: block; font-size: 10.5px; font-weight: 700; color: var(--skin-muted); }
+    .io-calc-metrics strong { display: block; font-size: 16.5px; font-weight: 800; color: #fff; margin-top: 3px; }
+
+    /* Stats Table */
+    .io-calc-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+    .io-calc-table th, .io-calc-table td { padding: 7px 6px; border-bottom: 1px solid var(--skin-border); text-align: right; }
+    .io-calc-table th:first-child { text-align: left; }
+    .io-calc-table thead th { font-weight: 700; color: var(--skin-muted); border-bottom: 2px solid var(--skin-border); }
+    .io-calc-table tr[data-stat="atk"] th { color: #f3b089; }
+    .io-calc-table tr[data-stat="spAtk"] th { color: #c8adff; }
+    .io-calc-table tr[data-stat="hp"] th { color: #86dcb3; }
+    .io-calc-table tr[data-stat="speed"] th { color: #e8cb7c; }
+
+    /* Offensive Profile - matching IdleBoard exact style */
+    .io-calc-offense {
+      margin-top: 6px; padding: 12px 14px; border: 1px solid var(--skin-border);
+      border-radius: 9px; background: var(--skin-input); font-size: 11.5px; line-height: 1.65;
+    }
+    .io-calc-offense > strong { display: block; font-size: 14px; font-weight: 800; color: #f3b089; margin-bottom: 5px; }
+    .io-calc-offense[data-focus="special"] > strong { color: #c8adff; }
+    .io-calc-offense[data-focus="balanced"] > strong { color: #8bdccc; }
+    .io-calc-split { height: 9px; background: #a98ade; border-radius: 5px; overflow: hidden; margin: 6px 0 7px; }
+    .io-calc-split > span { display: block; height: 100%; background: #e7a175; }
+    .io-calc-split-label { font-size: 11.5px; font-weight: 700; color: var(--skin-muted); margin: 0 !important; }
+    .io-calc-offense p { margin: 6px 0; }
+
+    /* Mega Evolution Tip - matching IdleBoard exact style */
+    .io-calc-mega-tip {
+      margin-top: 6px; padding: 12px 14px;
+      border: 1px solid rgba(168, 140, 221, 0.5); border-left: 3px solid #b697ef;
+      border-radius: 9px; background: var(--skin-panel); font-size: 11.5px; line-height: 1.65;
+    }
+    .io-calc-mega-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .io-calc-mega-head img { width: 52px; height: 52px; object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
+    .io-calc-mega-head h3 { margin: 0 0 3px !important; color: #d4bbff; font-size: 12px; }
+    .io-calc-mega-head strong { font-size: 15px; color: #fff; }
+    .io-calc-mega-change { color: var(--skin-active); font-weight: 700; margin: 6px 0; }
+    .io-calc-mega-warning {
+      font-size: 11.5px; padding: 9px 11px; border-radius: 6px;
+      background: rgba(223, 170, 80, 0.1); border-left: 3px solid #edba6c; color: #efc27d; margin: 8px 0;
+    }
+    .io-calc-mega-tip > .io-calc-offense {
+      margin-top: 8px; border: none; padding: 0; background: transparent;
+    }
+    .io-calc-mega-tip small {
+      display: block; font-size: 10.5px; line-height: 1.55; color: var(--skin-muted); margin-top: 8px;
+    }
+
+    /* Rework & Balance Badge */
+    .io-calc-rework-banner {
+      display: flex; flex-direction: column; gap: 6px;
+      margin-top: 6px; padding: 9px 12px; border-radius: 8px;
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .io-calc-rework-banner:hover {
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.18) 0%, rgba(245, 158, 11, 0.09) 100%);
+      border-color: rgba(245, 158, 11, 0.55);
+    }
+    .io-calc-rework-banner.mega-rework {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border-color: rgba(168, 85, 247, 0.4);
+    }
+    .io-calc-rework-banner.mega-rework:hover {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border-color: rgba(168, 85, 247, 0.6);
+    }
+    .rework-main { display: flex; align-items: center; gap: 8px; }
+    .rework-icon { font-size: 15px; color: #fbbf24; line-height: 1; flex-shrink: 0; }
+    .mega-rework .rework-icon { color: #c084fc; }
+    .rework-body { flex: 1; min-width: 0; }
+    .rework-title { font-size: 11.5px; font-weight: 750; color: #fde68a; line-height: 1.3; }
+    .mega-rework .rework-title { color: #e9d5ff; }
+    .rework-desc { font-size: 10.5px; color: #cbd5e1; line-height: 1.4; margin-top: 1px; }
+    .rework-hint { font-size: 10px; color: #94a3b8; font-weight: 600; margin-left: auto; white-space: nowrap; }
+    
+    /* Diff Details */
+    .rework-diff-details {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-top: 6px; padding-top: 8px; border-top: 1px dashed rgba(255, 255, 255, 0.12);
+    }
+    .rework-diff-group { display: flex; flex-direction: column; gap: 5px; }
+    .rework-diff-header {
+      font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .rework-diff-header.added { color: #86efac; }
+    .rework-diff-header.removed { color: #fca5a5; }
+    .rework-diff-header.changed { color: #fde047; }
+    .rework-diff-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .rework-diff-chip {
+      display: inline-flex; align-items: center; gap: 5px; font-size: 10px; padding: 3px 7px;
+      border-radius: 5px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f1f5f9; line-height: 1.3;
+    }
+    .rework-diff-chip.added {
+      border-color: rgba(74, 222, 128, 0.4); background: rgba(22, 101, 52, 0.3);
+    }
+    .rework-diff-chip.removed {
+      border-color: rgba(248, 113, 113, 0.4); background: rgba(153, 27, 27, 0.25);
+      text-decoration: line-through; opacity: 0.85;
+    }
+    .rework-diff-chip.changed {
+      border-color: rgba(250, 204, 21, 0.45); background: rgba(133, 77, 14, 0.3);
+    }
+    .chip-status { font-size: 9px; line-height: 1; }
+    .chip-name { font-weight: 750; color: #fff; }
+    .type-badge {
+      font-size: 8.5px; font-weight: 800; text-transform: uppercase; padding: 1px 5px;
+      border-radius: 3px; line-height: 1.2;
+    }
+    .cat-tag { font-size: 9px; color: #cbd5e1; font-weight: 600; }
+    .pow-tag {
+      font-size: 9px; font-weight: 700; color: #94a3b8; background: rgba(255, 255, 255, 0.08);
+      padding: 1px 4px; border-radius: 3px;
+    }
+
+    /* Footer */
+    .calc-footer {
+      flex: none; padding: 10px 22px; background: #080f1a; border-top: 1px solid var(--skin-border);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .calc-note { margin: 0; font-size: 10.5px; line-height: 1.55; color: #62788e; }
+    .calc-status { margin: 0; font-size: 11px; font-weight: 700; color: var(--skin-active); }
+  </style>
+</head>
+<body>
+  <div class="titlebar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#f1f5f9" stroke-width="2"/><path d="M2 12h20" stroke="#f1f5f9" stroke-width="2"/><circle cx="12" cy="12" r="3.5" stroke="#f1f5f9" stroke-width="2" fill="#080f1a"/></svg>
+      <b>Calculadora de Pokémon</b>
+      <small>PokeIdle.io</small>
+    </div>
+    <div class="header-center">
+      <div class="account-tabs" id="accountTabs">
+        <button class="acc-tab active" data-acc="0">Conta 1</button>
+        <button class="acc-tab" data-acc="1">Conta 2</button>
+        <button class="acc-tab" data-acc="2">Conta 3</button>
+        <button class="acc-tab" data-acc="3">Conta 4</button>
+      </div>
+      <button class="btn-sync" id="btnSync" title="Recarregar dados do jogo">↻ Sincronizar com o jogo</button>
+    </div>
+  </div>
+
+  <div class="calc-container">
+    <div class="calc-left">
+      <div class="species-row">
+        <label class="field-label" for="speciesSearch">🔎 Espécie</label>
+        <input type="search" id="speciesSearch" placeholder="Digite o nome ou número da espécie" list="speciesList" autocomplete="off" required>
+        <datalist id="speciesList"></datalist>
+      </div>
+
+      <div class="team-row">
+        <label class="field-label" for="teamSelect">Seu time</label>
+        <select id="teamSelect">
+          <option value="">Preencher com um Pokémon do time...</option>
+        </select>
+      </div>
+
+      <div class="basics-grid">
+        <div class="basics-card level">
+          <label class="field-label" for="inLevel">Nível do Pokémon</label>
+          <input type="number" id="inLevel" min="1" max="1000000" value="100" required>
+        </div>
+        <div class="basics-card quality">
+          <label class="field-label" for="inQuality">Qualidade · 0,800 a 1,800</label>
+          <input type="number" id="inQuality" min="0.8" max="1.8" step="0.001" value="1.000" required>
+        </div>
+        <div class="basics-card power">
+          <label class="field-label" for="inPower">Potência</label>
+          <select id="inPower">
+            <option value="1">P1 · ×1</option>
+            <option value="2">P2 · ×1,05</option>
+            <option value="3">P3 · ×1,10</option>
+            <option value="4">P4 · ×1,25</option>
+            <option value="5">P5 · ×2</option>
+          </select>
+        </div>
+        <div class="basics-card shiny">
+          <label class="field-label">Shiny</label>
+          <label class="shiny-box">
+            <input type="checkbox" id="inShiny">
+            <span>✨ Shiny · atributos ×3</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="iv-title">IV por atributo · 1 a 32</div>
+      <div class="ivs-grid">
+        <div class="iv-card hp">
+          <label class="field-label" for="ivHp">HP</label>
+          <input type="number" id="ivHp" min="1" max="32" value="16" required>
+        </div>
+        <div class="iv-card atk">
+          <label class="field-label" for="ivAtk">ATK</label>
+          <input type="number" id="ivAtk" min="1" max="32" value="16" required>
+        </div>
+        <div class="iv-card def">
+          <label class="field-label" for="ivDef">DEF</label>
+          <input type="number" id="ivDef" min="1" max="32" value="16" required>
+        </div>
+        <div class="iv-card spatk">
+          <label class="field-label" for="ivSpAtk">SP. ATK</label>
+          <input type="number" id="ivSpAtk" min="1" max="32" value="16" required>
+        </div>
+        <div class="iv-card spdef">
+          <label class="field-label" for="ivSpDef">SP. DEF</label>
+          <input type="number" id="ivSpDef" min="1" max="32" value="16" required>
+        </div>
+        <div class="iv-card speed">
+          <label class="field-label" for="ivSpd">SPD</label>
+          <input type="number" id="ivSpd" min="1" max="32" value="16" required>
+        </div>
+      </div>
+
+      <div id="ivWarnings" class="io-calc-iv-warnings" hidden></div>
+
+      <button type="button" id="btnCalculate" class="btn-calc">Calcular Pokémon</button>
+    </div>
+
+    <div class="calc-right" id="calcResult">
+      <div class="empty-state">
+        Escolha um Pokémon para ver sua nota e atributos.
+      </div>
+    </div>
+  </div>
+
+  <footer class="calc-footer">
+    <p class="calc-note">Nota dentro da espécie. Usa as regras públicas do PokeIdle.io, considerando evolução e o refino já lido dos Pokémon do time. Nenhum Pokémon é alterado no jogo. O perfil físico/especial usa os golpes naturais liberados no nível e não representa dano real ou chance de vitória.</p>
+    <p id="calcStatus" class="calc-status">Conectando ao PokeIdle.io...</p>
+  </footer>
+
+  <script src="calculator/io-iv-advice.js"></script>
+  <script>
+    (function () {
+      const keys = ['hp', 'atk', 'def', 'spAtk', 'spDef', 'speed'];
+      const labels = ['HP', 'ATK', 'DEF', 'SP. ATK', 'SP. DEF', 'SPD'];
+      const gradeNames = {
+        'extremamente-fraco': 'Extremamente fraco',
+        fraco: 'Fraco',
+        mediano: 'Mediano',
+        razoavel: 'Razoável',
+        bom: 'Bom',
+        forte: 'Forte',
+        poderoso: 'Poderoso',
+        mitico: 'Mítico',
+        legendario: 'Lendário',
+        divino: 'Divino'
+      };
+
+      let currentAccount = 0;
+      let initData = null;
+      let loadedRefino = {};
+      let loadedSpeciesId = null;
+      let lastOffense = null;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('i')) {
+        currentAccount = Math.max(0, Math.min(3, parseInt(urlParams.get('i'), 10) || 0));
+      }
+
+      // Elements
+      const accountTabs = document.getElementById('accountTabs');
+      const btnSync = document.getElementById('btnSync');
+      const speciesSearch = document.getElementById('speciesSearch');
+      const speciesList = document.getElementById('speciesList');
+      const teamSelect = document.getElementById('teamSelect');
+      const inLevel = document.getElementById('inLevel');
+      const inQuality = document.getElementById('inQuality');
+      const inPower = document.getElementById('inPower');
+      const inShiny = document.getElementById('inShiny');
+      const ivInputs = {
+        hp: document.getElementById('ivHp'),
+        atk: document.getElementById('ivAtk'),
+        def: document.getElementById('ivDef'),
+        spAtk: document.getElementById('ivSpAtk'),
+        spDef: document.getElementById('ivSpDef'),
+        speed: document.getElementById('ivSpd')
+      };
+      const ivWarnings = document.getElementById('ivWarnings');
+      const btnCalculate = document.getElementById('btnCalculate');
+      const calcResult = document.getElementById('calcResult');
+      const calcStatus = document.getElementById('calcStatus');
+
+      function setStatus(text, isError = false) {
+        calcStatus.textContent = text;
+        calcStatus.style.color = isError ? '#f87171' : 'var(--skin-active)';
+      }
+
+      function updateAccountTabs(contas) {
+        if (!contas || !contas.length) return;
+        const tabs = accountTabs.querySelectorAll('.acc-tab');
+        tabs.forEach((tab, idx) => {
+          if (contas[idx]) tab.textContent = contas[idx];
+          tab.classList.toggle('active', idx === currentAccount);
+        });
+      }
+
+      accountTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.acc-tab');
+        if (!btn) return;
+        const idx = parseInt(btn.dataset.acc, 10);
+        if (idx !== currentAccount) switchAccount(idx);
+      });
+
+      function switchAccount(idx) {
+        currentAccount = idx;
+        const tabs = accountTabs.querySelectorAll('.acc-tab');
+        tabs.forEach((tab, i) => tab.classList.toggle('active', i === currentAccount));
+        initCalculator();
+      }
+
+      btnSync.addEventListener('click', () => initCalculator(true));
+
+      async function initCalculator() {
+        setStatus(`Carregando dados da Conta ${currentAccount + 1}...`);
+        btnCalculate.disabled = true;
+
+        try {
+          const res = await window.api.calcGet(currentAccount, 'init');
+          if (res.erro) {
+            setStatus(res.erro, true);
+            btnCalculate.disabled = false;
+            return;
+          }
+          initData = res.data;
+          if (res.contas) updateAccountTabs(res.contas);
+
+          // Populate species datalist
+          speciesList.innerHTML = '';
+          if (initData.species) {
+            for (const s of initData.species) {
+              const opt = document.createElement('option');
+              opt.value = '#' + s.id + ' ' + s.name;
+              speciesList.appendChild(opt);
+            }
+          }
+
+          // Populate team select
+          teamSelect.innerHTML = '<option value="">Preencher com um Pokémon do time...</option>';
+          if (initData.collection && initData.collection.length) {
+            for (const p of initData.collection) {
+              const opt = document.createElement('option');
+              opt.value = String(p.id);
+              opt.textContent = `${p.name} · Nv. ${p.level}`;
+              teamSelect.appendChild(opt);
+            }
+          }
+
+          if (initData.active) {
+            fillPokemon(initData.active);
+            setStatus(`Carregado: ${initData.active.name || 'Pokémon ativo'}. Pronto para calcular.`);
+          } else {
+            setStatus('Catálogo carregado. Escolha um Pokémon ou preencha os dados.');
+          }
+        } catch (err) {
+          setStatus('Erro ao comunicar com a conta: ' + err.message, true);
+        } finally {
+          btnCalculate.disabled = false;
+        }
+      }
+
+      function getSelectedSpecies() {
+        if (!initData || !initData.species) return null;
+        const val = speciesSearch.value.trim().toLocaleLowerCase();
+        const idMatch = val.match(/^#?(\d+)/);
+        const searchId = idMatch ? parseInt(idMatch[1], 10) : null;
+        return initData.species.find(s =>
+          (searchId && s.id === searchId) ||
+          s.name.toLocaleLowerCase() === val ||
+          ('#' + s.id + ' ' + s.name).toLocaleLowerCase() === val
+        );
+      }
+
+      function fillPokemon(p) {
+        if (!p || !initData || !initData.species) return;
+        const sp = initData.species.find(s => s.id === (p.speciesId || p.sid));
+        if (sp) {
+          speciesSearch.value = '#' + sp.id + ' ' + sp.name;
+        }
+        inLevel.value = p.level || 100;
+        inQuality.value = p.quality != null ? Number(p.quality).toFixed(3) : (p.qualidade != null ? Number(p.qualidade).toFixed(3) : '1.000');
+        inPower.value = String(p.potencia || 1);
+        inShiny.checked = !!p.shiny;
+        loadedRefino = { ...(p.refino || {}) };
+        loadedSpeciesId = p.speciesId || p.sid;
+        lastOffense = null;
+
+        for (const k of keys) {
+          if (p.ivs && p.ivs[k] != null) {
+            ivInputs[k].value = p.ivs[k];
+          }
+        }
+        calculate();
+      }
+
+      teamSelect.addEventListener('change', () => {
+        if (!initData || !initData.collection) return;
+        const selected = initData.collection.find(p => String(p.id) === teamSelect.value);
+        if (selected) fillPokemon(selected);
+      });
+
+      function drawWarnings(offense) {
+        const values = Object.fromEntries(keys.map(k => [k, Number(ivInputs[k].value)]));
+        if (!window.CalcIvAdvice) return;
+        const items = window.CalcIvAdvice.advice(values, offense || lastOffense);
+        ivWarnings.innerHTML = '';
+        if (items.length) {
+          ivWarnings.hidden = false;
+          const h3 = document.createElement('h3');
+          h3.textContent = '⚠ Avisos de IV baixo';
+          ivWarnings.appendChild(h3);
+          for (const item of items) {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>⚠ ${item.label} · IV ${item.iv} / 32 — ${item.summary}</strong><small>${item.message}</small>`;
+            ivWarnings.appendChild(div);
+          }
+          const smallNote = document.createElement('small');
+          smallNote.textContent = 'Estes IVs estão abaixo de 15. Isso não torna o Pokémon ruim sozinho: espécie, nível, qualidade, potência e shiny também contam.';
+          ivWarnings.appendChild(smallNote);
+        } else {
+          ivWarnings.hidden = true;
+        }
+      }
+
+      function drawProfile(container, profile) {
+        const section = document.createElement('section');
+        section.className = 'io-calc-offense';
+        section.dataset.focus = profile.focus;
+        const focusTitles = {
+          physical: '⚔ Priorize ATK · físico',
+          special: '✦ Priorize SP. ATK · especial',
+          balanced: '⚖ Perfil misto · ATK e SP. ATK',
+          unknown: 'Sem golpes de dano informados'
+        };
+        const strong = document.createElement('strong');
+        strong.textContent = focusTitles[profile.focus] || 'Perfil Ofensivo';
+        section.appendChild(strong);
+
+        if (Number.isFinite(profile.physical)) {
+          const pct = Math.round(profile.physical * 100);
+          const pLabel = document.createElement('p');
+          pLabel.className = 'io-calc-split-label';
+          pLabel.textContent = `${pct}% físico · ${100 - pct}% especial`;
+
+          const bar = document.createElement('div');
+          bar.className = 'io-calc-split';
+          const part = document.createElement('span');
+          part.style.width = pct + '%';
+          bar.appendChild(part);
+
+          const pCounts = document.createElement('p');
+          pCounts.textContent = `${profile.counts.PHYSICAL} golpes físicos usam ATK · ${profile.counts.SPECIAL} especiais usam SP. ATK.`;
+
+          const pAdvice = document.createElement('p');
+          pAdvice.textContent = profile.focus === 'physical'
+            ? 'Valorize o IV de ATK para os golpes físicos. SP. ATK só ajuda nos golpes especiais.'
+            : profile.focus === 'special'
+            ? 'Valorize o IV de SP. ATK para os golpes especiais. ATK só ajuda nos golpes físicos.'
+            : 'Os dois atributos são úteis. Valorize ATK e SP. ATK; o melhor equilíbrio depende dos golpes e do adversário.';
+
+          section.append(pLabel, bar, pCounts, pAdvice);
+        }
+        container.appendChild(section);
+        return section;
+      }
+
+      const typeColors = {
+        NORMAL: '#9ca3af', FIRE: '#f97316', WATER: '#38bdf8', ELECTRIC: '#facc15',
+        GRASS: '#4ade80', ICE: '#67e8f9', FIGHTING: '#f87171', POISON: '#c084fc',
+        GROUND: '#eab308', FLYING: '#a5b4fc', PSYCHIC: '#f472b6', BUG: '#a3e635',
+        ROCK: '#d97706', GHOST: '#818cf8', DRAGON: '#6366f1', STEEL: '#94a3b8',
+        DARK: '#a8a29e', FAIRY: '#f472b6'
+      };
+
+      const typeNames = {
+        NORMAL: 'Normal', FIRE: 'Fogo', WATER: 'Água', ELECTRIC: 'Elétrico',
+        GRASS: 'Planta', ICE: 'Gelo', FIGHTING: 'Lutador', POISON: 'Veneno',
+        GROUND: 'Terra', FLYING: 'Voador', PSYCHIC: 'Psíquico', BUG: 'Inseto',
+        ROCK: 'Pedra', GHOST: 'Fantasma', DRAGON: 'Dragão', STEEL: 'Aço',
+        DARK: 'Noturno', FAIRY: 'Fada'
+      };
+
+      function createReworkBanner(rework, isMega = false) {
+        const banner = document.createElement('div');
+        banner.className = 'io-calc-rework-banner' + (isMega ? ' mega-rework' : '');
+        banner.title = 'Clique para ver ou ocultar os detalhes das alterações de golpes';
+
+        const addedCount = rework.added?.length || 0;
+        const removedCount = rework.removed?.length || 0;
+        const diffSummary = [];
+        if (addedCount > 0) diffSummary.push(`<span style="color: #86efac; font-weight: 700;">+${addedCount} adicionado${addedCount > 1 ? 's' : ''}</span>`);
+        if (removedCount > 0) diffSummary.push(`<span style="color: #fca5a5; font-weight: 700;">-${removedCount} removido${removedCount > 1 ? 's' : ''}</span>`);
+        const diffText = diffSummary.length > 0 ? ` (${diffSummary.join(', ')})` : '';
+
+        const main = document.createElement('div');
+        main.className = 'rework-main';
+        main.innerHTML = `
+          <div class="rework-icon">⚡</div>
+          <div class="rework-body">
+            <div class="rework-title">${isMega ? 'Mega balanceada' : 'Balanceado'} em <b>${rework.date}</b> (${rework.type})</div>
+            <div class="rework-desc">Moveset atual: <b>${rework.moveCount} golpes</b> (${rework.physical} físicos, ${rework.special} especiais)${diffText}.</div>
+          </div>
+          <div class="rework-hint">Ver mudanças ▾</div>
+        `;
+        banner.appendChild(main);
+
+        const details = document.createElement('div');
+        details.className = 'rework-diff-details';
+        details.style.display = 'none';
+
+        const renderChip = (m, status, extra = '') => {
+          const chip = document.createElement('span');
+          chip.className = 'rework-diff-chip ' + status;
+          const tColor = typeColors[m.type] || '#94a3b8';
+          const tName = typeNames[m.type] || m.type;
+          const isPhys = m.category === 'PHYSICAL';
+          const catIcon = isPhys ? '⚔' : '✦';
+          const catLabel = isPhys ? 'Físico' : 'Especial';
+          const statusIcon = status === 'added' ? '➕' : status === 'removed' ? '➖' : '🔄';
+
+          chip.innerHTML = `
+            <span class="chip-status">${statusIcon}</span>
+            <b class="chip-name">${m.name}</b>
+            <span class="type-badge" style="background: ${tColor}22; color: ${tColor}; border: 1px solid ${tColor}55;">${tName}</span>
+            <span class="cat-tag" title="Categoria">${extra || (catIcon + ' ' + catLabel)}</span>
+            ${m.power ? `<span class="pow-tag" title="Poder">${m.power}</span>` : ''}
+          `;
+          return chip;
+        };
+
+        // Added Moves
+        if (rework.added && rework.added.length > 0) {
+          const grp = document.createElement('div');
+          grp.className = 'rework-diff-group';
+          const title = document.createElement('div');
+          title.className = 'rework-diff-header added';
+          title.textContent = `➕ Golpes Adicionados (${rework.added.length})`;
+          const chips = document.createElement('div');
+          chips.className = 'rework-diff-chips';
+          for (const m of rework.added) chips.appendChild(renderChip(m, 'added'));
+          grp.append(title, chips);
+          details.appendChild(grp);
+        }
+
+        // Removed Moves
+        if (rework.removed && rework.removed.length > 0) {
+          const grp = document.createElement('div');
+          grp.className = 'rework-diff-group';
+          const title = document.createElement('div');
+          title.className = 'rework-diff-header removed';
+          title.textContent = `➖ Golpes Removidos (${rework.removed.length})`;
+          const chips = document.createElement('div');
+          chips.className = 'rework-diff-chips';
+          for (const m of rework.removed) chips.appendChild(renderChip(m, 'removed'));
+          grp.append(title, chips);
+          details.appendChild(grp);
+        }
+
+        // Changed Category Moves
+        const changedMoves = (rework.kept || []).filter(k => k.changedCategory);
+        if (changedMoves.length > 0) {
+          const grp = document.createElement('div');
+          grp.className = 'rework-diff-group';
+          const title = document.createElement('div');
+          title.className = 'rework-diff-header changed';
+          title.textContent = `🔄 Categoria Ajustada (${changedMoves.length})`;
+          const chips = document.createElement('div');
+          chips.className = 'rework-diff-chips';
+          for (const m of changedMoves) {
+            const prevCat = m.prevCategory === 'PHYSICAL' ? 'Físico' : 'Especial';
+            const newCat = m.category === 'PHYSICAL' ? 'Físico' : 'Especial';
+            chips.appendChild(renderChip(m, 'changed', `${prevCat} ➔ ${newCat}`));
+          }
+          grp.append(title, chips);
+          details.appendChild(grp);
+        }
+
+        banner.appendChild(details);
+
+        banner.addEventListener('click', () => {
+          const isHidden = details.style.display === 'none';
+          details.style.display = isHidden ? 'flex' : 'none';
+          main.querySelector('.rework-hint').textContent = isHidden ? 'Ocultar ▴' : 'Ver mudanças ▾';
+        });
+
+        return banner;
+      }
+
+      function drawMega(container, preview, pokemon, current) {
+        if (!preview) return;
+        const megaTip = document.createElement('section');
+        megaTip.className = 'io-calc-mega-tip';
+        megaTip.setAttribute('aria-label', 'Pensando em fazer Mega?');
+
+        const head = document.createElement('div');
+        head.className = 'io-calc-mega-head';
+        if (preview.sprite && preview.sprite.startsWith('data:image/png;base64,')) {
+          const image = document.createElement('img');
+          image.src = preview.sprite;
+          image.alt = preview.name;
+          head.appendChild(image);
+        }
+        const caption = document.createElement('div');
+        const h3 = document.createElement('h3');
+        h3.textContent = '💡 Pensando em fazer Mega?';
+        const strong = document.createElement('strong');
+        strong.textContent = preview.name;
+        caption.append(h3, strong);
+        head.appendChild(caption);
+        megaTip.appendChild(head);
+
+        const profile = preview.offense;
+        if (current?.total && profile?.total && current.focus !== profile.focus) {
+          const pChange = document.createElement('p');
+          pChange.className = 'io-calc-mega-change';
+          pChange.textContent = 'A prioridade dos atributos muda nesta Mega. Confira o perfil antes de escolher seu Pokémon.';
+          megaTip.appendChild(pChange);
+        }
+
+        if (profile) {
+          drawProfile(megaTip, profile);
+        }
+
+        if (preview.rework && preview.rework.hasRework) {
+          const reworkBanner = createReworkBanner(preview.rework, true);
+          megaTip.appendChild(reworkBanner);
+        }
+
+        const relevant = profile?.focus === 'special' ? 'spAtk' : profile?.focus === 'physical' ? 'atk' : null;
+        if (relevant && pokemon.ivs[relevant] < 15) {
+          const pWarn = document.createElement('p');
+          pWarn.className = 'io-calc-mega-warning';
+          pWarn.textContent = `⚠ Seu IV de ${relevant === 'atk' ? 'ATK' : 'SP. ATK'} é ${pokemon.ivs[relevant]}/32. Por estar baixo, pode limitar o dano dos golpes que essa Mega mais utiliza.`;
+          megaTip.appendChild(pWarn);
+        }
+
+        const small = document.createElement('small');
+        small.textContent = 'Usa os mesmos IVs do Pokémon selecionado. É uma orientação pelos golpes disponíveis no nível informado, sem alterar seu Pokémon no jogo.';
+        megaTip.appendChild(small);
+
+        container.appendChild(megaTip);
+      }
+
+      async function calculate() {
+        const sp = getSelectedSpecies();
+        if (!sp) {
+          setStatus('Selecione uma espécie válida da lista.', true);
+          return;
+        }
+
+        const pokemon = {
+          speciesId: sp.id,
+          level: Number(inLevel.value) || 100,
+          quality: Number(inQuality.value) || 1,
+          potencia: Number(inPower.value) || 1,
+          shiny: inShiny.checked,
+          ivs: Object.fromEntries(keys.map(k => [k, Number(ivInputs[k].value) || 16])),
+          refino: sp.id === loadedSpeciesId ? loadedRefino : {}
+        };
+
+        setStatus('Calculando atributos...');
+        btnCalculate.disabled = true;
+
+        try {
+          const res = await window.api.calcGet(currentAccount, 'calculate', pokemon);
+          if (res.erro) {
+            setStatus(res.erro, true);
+            return;
+          }
+
+          const r = res.data;
+          lastOffense = r.offense;
+          drawWarnings(r.offense);
+          renderResults(r, pokemon);
+          setStatus('Cálculo concluído com sucesso!');
+        } catch (err) {
+          setStatus('Erro no cálculo: ' + err.message, true);
+        } finally {
+          btnCalculate.disabled = false;
+        }
+      }
+
+      function renderResults(r, pokemon) {
+        calcResult.innerHTML = '';
+
+        // Hero Card
+        const hero = document.createElement('div');
+        hero.className = 'io-calc-hero';
+        hero.dataset.grade = r.faixa;
+
+        if (r.sprite) {
+          const img = document.createElement('img');
+          img.src = r.sprite;
+          img.alt = r.name;
+          hero.appendChild(img);
+        }
+
+        const h3 = document.createElement('h3');
+        h3.textContent = r.name;
+        hero.appendChild(h3);
+
+        const scoreDiv = document.createElement('div');
+        scoreDiv.className = 'io-calc-score';
+        scoreDiv.textContent = r.nota == null ? 'Inestimável' : r.nota.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' / 10';
+        hero.appendChild(scoreDiv);
+
+        const badgeSpan = document.createElement('span');
+        badgeSpan.textContent = gradeNames[r.faixa] || r.faixa;
+        hero.appendChild(badgeSpan);
+
+        calcResult.appendChild(hero);
+
+        // Rework & Balance Banner
+        if (r.rework && r.rework.hasRework) {
+          const reworkBanner = createReworkBanner(r.rework, false);
+          calcResult.appendChild(reworkBanner);
+        }
+
+        // Metrics Grid
+        const metrics = document.createElement('div');
+        metrics.className = 'io-calc-metrics';
+        const metricList = [
+          ['HP de combate', r.hpCombat],
+          ['Poder do ranking', r.power],
+          ['IV somado', r.ivTotal + ' / 192'],
+          ['Multiplicador', '×' + r.mult.toLocaleString('pt-BR')]
+        ];
+        for (const [title, val] of metricList) {
+          const m = document.createElement('div');
+          m.innerHTML = `<small>${title}</small><strong>${typeof val === 'number' ? val.toLocaleString('pt-BR') : val}</strong>`;
+          metrics.appendChild(m);
+        }
+        calcResult.appendChild(metrics);
+
+        // Stats Table
+        const table = document.createElement('table');
+        table.className = 'io-calc-table';
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Atributo</th>
+              <th>Base + refino</th>
+              <th>No nível ${pokemon.level}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${keys.map((k, i) => `
+              <tr data-stat="${k}">
+                <th>${labels[i]}</th>
+                <td>${r.bases[k].toLocaleString('pt-BR')}</td>
+                <td>${r.stats[k].toLocaleString('pt-BR')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        `;
+        calcResult.appendChild(table);
+
+        // Offensive Profile
+        if (r.offense) {
+          drawProfile(calcResult, r.offense);
+        }
+
+        // Mega Advice
+        if (r.megaAdvice) {
+          drawMega(calcResult, r.megaAdvice, pokemon, r.offense);
+        }
+      }
+
+      btnCalculate.addEventListener('click', calculate);
+      speciesSearch.addEventListener('input', () => {
+        loadedRefino = {};
+        loadedSpeciesId = null;
+        lastOffense = null;
+        drawWarnings();
+      });
+
+      if (window.api && window.api.onCalcAccount) {
+        window.api.onCalcAccount((i) => {
+          if (Number.isInteger(i) && i >= 0 && i <= 3) switchAccount(i);
+        });
+      }
+
+      initCalculator();
+    })();
+  </script>
+</body>
+</html>

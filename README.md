@@ -4,27 +4,21 @@ Gerenciador multi-contas de alta performance para o jogo [PokeIdle](https://poke
 
 ---
 
-## 🚀 Novidades da versão (v1.1.2)
+## 🚀 Novidades da versão (v1.1.3)
 
-- **Correção no Modo Hibernar**: A tela da conta agora volta imediatamente ao recarregar ou sair da hibernação.
-- **Sessão /hunt Mais Limpa**: Removido o botão e banner de "Apoie o dev" de dentro da janela do /hunt para um visual mais focado no jogo.
-- **Novo Ícone (Master Ball Edition)**: Ícone oficial inspirado na Master Ball em alta definição para o executável, barra de tarefas e bandeja do sistema.
-- **Minimizar para a Bandeja (Ícones Ocultos)**: Ao clicar no "X" para fechar, o Mefislink continua rodando em segundo plano sem interromper o farm das contas. Reabra com um clique no ícone da bandeja ou encerre através do botão direito > *Encerrar o Mefislink* (ou pelo menu *Ajuda > Encerrar*).
-- **Instância Única (Single Instance)**: Se tentar abrir o programa novamente enquanto ele estiver minimizado nos ícones ocultos, a janela atual é trazida para a frente automaticamente, evitando duplicatas.
-- **Barra Superior Mais Limpa**: Removida a aba de atualizações para simplificar o menu.
-- **Portabilidade Total**: Executável único pronto para envio (`Mefislink-v1.1.2-Portable.exe`). Não precisa instalar nada: basta dar dois cliques para abrir.
-- **Gerenciamento de Dados**:
-  - Por padrão, cada computador salva os logins de forma segura e independente em `%APPDATA%\Mefislink`.
-  - Se preferir usar em um Pendrive de forma 100% isolada, basta criar uma pasta chamada `mefislink-data` na mesma pasta do executável.
+- **Calculadora de Pokémon Integrada (Atalho Ctrl+K ou Menu Superior)**: Avaliação detalhada de IVs, notas de 0 a 10 (Forte, Razoável, Bom, Mítico, Divino, etc.), cálculo de HP de combate, multiplicador de nascimento e refinos sincronizados em tempo real com qualquer uma das suas 4 contas.
+- **Detector de Balanceamento & Changelogs de Golpes**: Monitora atualizações e reworks oficiais de movesets direto dos servidores do PokeIdle, exibindo data do patch, golpes adicionados (+), removidos (-) e mudanças de categoria (Físico vs Especial) com tags coloridas dos tipos elementais.
+- **Suporte Completo a Mega Evoluções**: Análise dinâmica do perfil ofensivo de todas as formas Mega, com alertas preditivos de IVs baixos e histórico de balanceamento da Mega.
+- **Portabilidade Total**: Executável único pronto para envio (`Mefislink-v1.1.3-Portable.exe`). Não precisa instalar nada: basta dar dois cliques para abrir.
 
 ---
 
 ## 📦 Download e Como Compartilhar
 
 Você e seus amigos podem baixar o executável pronto diretamente nas Releases do GitHub:
-👉 **[Baixar Mefislink v1.1.2 Portable (Releases)](https://github.com/jaazielgvs/Mefislink/releases/latest)**
+👉 **[Baixar Mefislink v1.1.3 Portable (Releases)](https://github.com/jaazielgvs/Mefislink/releases/latest)**
 
-Não precisa instalar nada! Basta baixar o arquivo `Mefislink-v1.1.2-Portable.exe`, dar dois cliques para abrir e fazer login com as 4 contas normalmente. Também é possível compartilhar o executável diretamente via Discord, Drive ou Telegram.
+Não precisa instalar nada! Basta baixar o arquivo `Mefislink-v1.1.3-Portable.exe`, dar dois cliques para abrir e fazer login com as 4 contas normalmente. Também é possível compartilhar o executável diretamente via Discord, Drive ou Telegram.
 
 ---
 

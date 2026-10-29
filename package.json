@@ -1,7 +1,7 @@
 {
   "name": "mefislink",
   "productName": "Mefislink",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Mefislink - 4 contas do jogo PokeIdle em uma janela só",
   "main": "main.js",
   "author": "Mefis",
@@ -23,12 +23,14 @@
       "signAndEditExecutable": false
     },
     "portable": {
-      "artifactName": "Mefislink-v1.1.2-Portable.exe"
+      "artifactName": "Mefislink-v1.1.3-Portable.exe"
     },
     "files": [
       "main.js",
       "preload.js",
       "bar.html",
+      "calculator.html",
+      "calculator/**/*",
       "icone.ico",
       "icone.png",
       "package.json"

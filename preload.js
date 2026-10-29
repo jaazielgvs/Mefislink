@@ -41,6 +41,10 @@ contextBridge.exposeInMainWorld('api', {
   // análise de PvP
   pvpGet: (i, force) => ipcRenderer.invoke('pvp-get', i, !!force),
   onPvpAccount: (cb) => ipcRenderer.on('pvp-account', (_, i) => cb(i)),
+  // calculadora de Pokémon
+  calcGet: (i, action, pokemon) => ipcRenderer.invoke('calc-get', i, action, pokemon),
+  onCalcAccount: (cb) => ipcRenderer.on('calc-account', (_, i) => cb(i)),
+  openCalc: (i) => ipcRenderer.send('calc-open', i),
   // barra de título customizada
   titleReady: () => ipcRenderer.send('title-ready'),
   titleOpen: (open) => ipcRenderer.send('title-open', !!open),

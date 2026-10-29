@@ -73,7 +73,7 @@ const ACCOUNTS = ['Conta 1', 'Conta 2', 'Conta 3', 'Conta 4'];
 
 // ====== VERSÃO ======
 const APP_NAME = 'Mefislink';
-const APP_VERSION = '1.1.2';
+const APP_VERSION = '1.1.3';
 const APP_CHANNEL = '';
 // Contato para pedidos de remoção (aparece em "Direitos e marcas"). Ex.: 'contato@seudominio.com'
 // Enquanto estiver vazio, esse trecho não é exibido.
@@ -882,6 +882,14 @@ function buildMenu() {
     {
       label: 'PvP',
       submenu: each((i) => ({ label: `Análise de PvP — ${nameOf(i)}`, click: () => openPvp(i) })),
+    },
+    {
+      label: 'Calculadora',
+      submenu: [
+        { label: 'Abrir Calculadora (Conta ativa)', accelerator: 'CmdOrCtrl+K', click: () => openCalc(focused >= 0 ? focused : 0) },
+        { type: 'separator' },
+        ...each((i) => ({ label: `Calculadora — ${nameOf(i)}`, click: () => openCalc(i) })),
+      ],
     },
     {
       label: 'Ajuda',
@@ -1865,7 +1873,17 @@ async function downloadExt(id) {
   const tmp = path.join(extRoot(id), '_baixando');
   fs.rmSync(tmp, { recursive: true, force: true });
   unzipTo(crxToZip(buf), tmp);
-  const version = JSON.parse(fs.readFileSync(path.join(tmp, 'manifest.json'), 'utf8')).version;
+  let version = null;
+  try {
+    const manifestPath = path.join(tmp, 'manifest.json');
+    if (fs.existsSync(manifestPath)) {
+      version = JSON.parse(fs.readFileSync(manifestPath, 'utf8')).version;
+    }
+  } catch {}
+  if (!version) {
+    fs.rmSync(tmp, { recursive: true, force: true });
+    throw new Error('Extensão sem manifest.json válido');
+  }
   const dir = path.join(extRoot(id), version);
   if (fs.existsSync(path.join(dir, 'manifest.json'))) fs.rmSync(tmp, { recursive: true, force: true });
   else { fs.rmSync(dir, { recursive: true, force: true }); fs.renameSync(tmp, dir); }
@@ -2488,6 +2506,76 @@ async function pvpCollectAll() {
   }
 }
 
+// ---------- Calculadora de Pokémon (PokeIdle.io) ----------
+const ioCalculatorService = require('./calculator/io-calculator-service');
+const { installIoState } = require('./calculator/game-preload');
+
+let calcWin = null;
+function openCalc(i) {
+  const acc = (Number.isInteger(i) && i >= 0 && i < ACCOUNTS.length) ? i : (focused >= 0 ? focused : 0);
+  if (calcWin && !calcWin.isDestroyed()) {
+    calcWin.webContents.send('calc-account', acc);
+    calcWin.show();
+    calcWin.focus();
+    return;
+  }
+  calcWin = new BrowserWindow({
+    width: 1100, height: 860, minWidth: 840, minHeight: 600,
+    title: 'Calculadora de Pokémon — Mefislink',
+    backgroundColor: '#090e18', autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: { color: TITLE_BG, symbolColor: TITLE_FG, height: TITLE_H },
+    ...(customIconPath() ? { icon: customIconPath() } : {}),
+    webPreferences: { preload: path.join(__dirname, 'preload.js') },
+  });
+  calcWin.setMenu(null);
+  calcWin.loadFile(path.join(__dirname, 'calculator.html'), { query: { i: String(acc) } });
+  calcWin.on('closed', () => { calcWin = null; });
+}
+
+ipcMain.on('calc-open', (_, i) => openCalc(i));
+
+ipcMain.handle('calc-get', async (_, i, action, pokemon) => {
+  if (!Number.isInteger(i) || i < 0 || i >= ACCOUNTS.length) return { erro: 'Conta inválida.' };
+  const v = views[i];
+  if (!v || v.webContents.isDestroyed()) return { erro: `A tela de ${nameOf(i)} não está pronta.` };
+
+  try {
+    const curUrl = v.webContents.getURL();
+    const origin = new URL(curUrl).origin;
+    if (origin !== 'https://pokeidle.io') {
+      return { erro: `A ${nameOf(i)} ainda não carregou o PokeIdle.io. Conclua o login e tente novamente.` };
+    }
+  } catch (e) {
+    return { erro: `Não foi possível verificar o jogo em ${nameOf(i)}.` };
+  }
+
+  // Garante o estado passivo injetado na sessão do jogo
+  await v.webContents.executeJavaScript(`
+    try {
+      if (!window.__idleboardIoState && location.origin === 'https://pokeidle.io') {
+        (${installIoState.toString()})();
+      }
+    } catch(e) {}
+  `).catch(() => {});
+
+  const script = ioCalculatorService.buildScript({ action, pokemon });
+  let timeout;
+  try {
+    const res = await Promise.race([
+      v.webContents.executeJavaScript(script),
+      new Promise((_, reject) => {
+        timeout = setTimeout(() => reject(new Error('Tempo limite esgotado ao consultar o jogo.')), 20000);
+      })
+    ]);
+    return { ok: true, data: res, contas: displayNames(), conta: i };
+  } catch (err) {
+    return { erro: err.message || 'Erro ao processar cálculo no jogo.' };
+  } finally {
+    clearTimeout(timeout);
+  }
+});
+
 // ---------- Importar o login da Kick de um navegador normal ----------
 // A proteção anti-robô da Kick recusa o login feito dentro do Mefislink. Em vez de logar aqui,
 // o usuário loga no Chrome/Edge, exporta os cookies da kick.com (extensão "Cookie-Editor" → Export → JSON)
@@ -3067,6 +3155,7 @@ function createWindow() {
       webPreferences: {
         partition: `persist:conta${i + 1}`, // cookies/login próprios de cada conta
         backgroundThrottling: false,        // não pausa quando a view não está visível
+        preload: path.join(__dirname, 'calculator', 'game-preload.js'),
       },
     });
 
@@ -3142,6 +3231,13 @@ function createWindow() {
       view.webContents.executeJavaScript(`
         try {
           Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+        } catch(e) {}
+      `).catch(() => {});
+      view.webContents.executeJavaScript(`
+        try {
+          if (!window.__idleboardIoState && location.origin === 'https://pokeidle.io') {
+            (${installIoState.toString()})();
+          }
         } catch(e) {}
       `).catch(() => {});
     });
